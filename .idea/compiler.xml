@@ -8,8 +8,8 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="rapid-dao" />
+        <module name="rapid-security" />
         <module name="rapid-core" />
-        <module name="spring-security" />
         <module name="rapid-web" />
         <module name="rapid-service" />
       </profile>
@@ -21,9 +21,9 @@
       <module name="rapid-core" options="-parameters" />
       <module name="rapid-dao" options="-parameters" />
       <module name="rapid-groove" options="" />
+      <module name="rapid-security" options="-parameters" />
       <module name="rapid-service" options="-parameters" />
       <module name="rapid-web" options="-parameters" />
-      <module name="spring-security" options="-parameters" />
     </option>
   </component>
 </project>
