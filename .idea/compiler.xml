@@ -17,7 +17,6 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="Rapid-Groove-Enterprise-Application" options="" />
       <module name="rapid-core" options="-parameters" />
       <module name="rapid-dao" options="-parameters" />
       <module name="rapid-groove" options="" />

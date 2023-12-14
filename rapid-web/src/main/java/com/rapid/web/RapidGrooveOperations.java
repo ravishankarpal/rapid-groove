@@ -17,7 +17,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EnableJpaRepositories("com.rapid.dao")
 @EntityScan("com.rapid.core")
-@ComponentScan(basePackages  = {"com.rapid.service"})
+@ComponentScan(basePackages  = {"com.rapid.service","com.rapid.security","com.rapid.security.service"})
 
 
 

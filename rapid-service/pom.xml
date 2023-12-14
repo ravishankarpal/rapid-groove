@@ -25,7 +25,14 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.rapid.security</groupId>
+            <artifactId>rapid-security</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
+
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

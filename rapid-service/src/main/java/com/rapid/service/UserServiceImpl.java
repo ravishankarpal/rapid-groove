@@ -6,6 +6,7 @@ import com.rapid.dao.RoleRepository;
 import com.rapid.dao.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -14,12 +15,16 @@ import java.util.Set;
 @Service
 @Slf4j
 public class UserServiceImpl implements  UserService{
+    @Autowired(required = false)
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private RoleRepository roleRepository;
+
+
     @Override
     public void registerUser(User user) {
 
@@ -43,7 +48,7 @@ public class UserServiceImpl implements  UserService{
         adminUser.setUserName("ravi_6732");
         adminUser.setUserName("Ravi");
         adminUser.setUserLastName("Shankar");
-        adminUser.setUserPassword("Ra@673");
+        adminUser.setUserPassword(passwordEncoder.encode("Shankar@5646"));
         Set<Role> adminRoles = new HashSet<>();
         adminRoles.add(adminRole);
         userRepository.saveAndFlush(adminUser);
@@ -52,7 +57,7 @@ public class UserServiceImpl implements  UserService{
         adminUser.setUserName("sha_6732");
         adminUser.setUserName("Rajat");
         adminUser.setUserLastName("Sharma");
-        adminUser.setUserPassword("Rajat@673");
+        adminUser.setUserPassword(passwordEncoder.encode("Rajat@673"));
         Set<Role> userRoles = new HashSet<>();
         adminRoles.add(userRole);
         userRepository.saveAndFlush(user);
