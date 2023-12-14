@@ -2,7 +2,9 @@ package com.rapid.web.controller;
 
 import com.rapid.core.entity.User;
 import com.rapid.service.UserService;
-import jakarta.annotation.PostConstruct;
+//import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +26,7 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostConstruct
+  // @PostConstruct
     public void initiateRolesAndUser(){
         userService.initiateRolesAndUser();
     }

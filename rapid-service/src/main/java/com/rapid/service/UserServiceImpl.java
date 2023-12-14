@@ -15,7 +15,7 @@ import java.util.Set;
 @Service
 @Slf4j
 public class UserServiceImpl implements  UserService{
-    @Autowired(required = false)
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired

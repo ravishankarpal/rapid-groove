@@ -6,10 +6,13 @@ import com.rapid.dao.UserRepository;
 import com.rapid.security.JwtTokenDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -31,6 +34,7 @@ public class JwtServiceImpl implements UserDetailsService,JwtService {
     private JwtTokenDetails jwtTokenDetails;
 
     @Autowired
+    @Lazy
     private AuthenticationManager authenticationManager;
 
     private static final String TAG = "JwtServiceImpl";
@@ -87,5 +91,7 @@ public class JwtServiceImpl implements UserDetailsService,JwtService {
 
         return  authorities;
     }
+
+
 
 }
