@@ -27,8 +27,14 @@ public class UserServiceImpl implements  UserService{
 
     @Override
     public void registerUser(User user) {
+        User us = new User();
+        us.setUserName(user.getUserName());
+        us.setUserFirstName(user.getUserFirstName());
+        us.setUserLastName(user.getUserLastName());
+        us.setRole(user.getRole());
+        us.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
 
-        userRepository.saveAndFlush(user);
+        userRepository.saveAndFlush(us);
 
     }
 
@@ -46,7 +52,7 @@ public class UserServiceImpl implements  UserService{
 
         User adminUser = new User();
         adminUser.setUserName("ravi_6732");
-        adminUser.setUserName("Ravi");
+
         adminUser.setUserLastName("Shankar");
         adminUser.setUserPassword(passwordEncoder.encode("Shankar@5646"));
         Set<Role> adminRoles = new HashSet<>();
