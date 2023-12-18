@@ -12,6 +12,27 @@
     <groupId>com.rapid.web</groupId>
     <artifactId>rapid-web</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.rapid.core</groupId>
+            <artifactId>rapid-core</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.rapid.dao</groupId>
+            <artifactId>rapid-service</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+            <version>1.2</version>
+        </dependency>
+    </dependencies>
+
+
+
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
