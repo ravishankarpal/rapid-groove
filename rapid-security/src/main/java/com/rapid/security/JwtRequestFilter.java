@@ -48,7 +48,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 log.error("Jwt token expired", e);
             }
         }else{
-            log.info("Header must be start with bearer");
+            log.info("Header must be start with Bearer");
         }
         if (userName != null && SecurityContextHolder.getContext()
                 .getAuthentication() == null){
@@ -64,10 +64,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
             }
         }
-
         filterChain.doFilter(request,response);
-
-
 
     }
 

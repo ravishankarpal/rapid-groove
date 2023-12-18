@@ -24,6 +24,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @Configuration
 @RequiredArgsConstructor
 @EnableMethodSecurity
+
 public class WebSecurityChainFilterConfiguration  {
     @Autowired
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -42,42 +43,8 @@ public class WebSecurityChainFilterConfiguration  {
         return configuration.getAuthenticationManager();
     }
 
-
-
-//    @Bean
-//    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-//        //httpSecurity.cors(Object::notifyAll);
-//        //httpSecurity.csrf().disable()
-//
-////        httpSecurity.authorizeHttpRequests(
-////                authorize -> authorize.requestMatchers("/authenticate","/rapid/user/register_user").permitAll()
-////                        .requestMatchers(HttpHeaders.ALLOW).permitAll()
-////                        .anyRequest().authenticated()
-////                )
-//        httpSecurity.authorizeHttpRequests(
-//                        authorize -> authorize.anyRequest() .permitAll()
-//                )
-////                .formLogin(login ->login.loginPage("/sign")
-////                        .usernameParameter("email")
-////                        .defaultSuccessUrl("/",true)
-////                        .permitAll())
-//                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-//                .sessionManagement(ses -> ses.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-//                ;
-//
-//
-//        httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-//
-//        return httpSecurity.build();
-//    }
-
-
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http.cors(httpSecurityCorsConfigurer ->
-//                httpSecurityCorsConfigurer.
-//                        configurationSource(configuration.corsConfigure()));
          http.cors(Customizer.withDefaults());
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {

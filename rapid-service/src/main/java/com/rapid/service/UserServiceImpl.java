@@ -28,12 +28,14 @@ public class UserServiceImpl implements  UserService{
     @Override
     public void registerUser(User user) {
         User us = new User();
+        Role role = roleRepository.findById("User").get();
+        Set<Role> userRole  = new HashSet<>();
+        userRole.add(role);
         us.setUserName(user.getUserName());
         us.setUserFirstName(user.getUserFirstName());
         us.setUserLastName(user.getUserLastName());
-        us.setRole(user.getRole());
+        us.setRole(userRole);
         us.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
-
         userRepository.saveAndFlush(us);
 
     }
@@ -41,29 +43,29 @@ public class UserServiceImpl implements  UserService{
     @Override
     public  void initiateRolesAndUser(){
         Role adminRole = new Role();
-        adminRole.setRoleName("Ravi Shankar");
+        adminRole.setRoleName("Admin");
         adminRole.setRoleDescriptions("Admin Role");
         roleRepository.saveAndFlush(adminRole);
 
         Role userRole = new Role();
-        userRole.setRoleName("Rajat");
-        userRole.setRoleDescriptions("User");
+        userRole.setRoleName("User");
+        userRole.setRoleDescriptions("User Role");
         roleRepository.saveAndFlush(userRole);
 
         User adminUser = new User();
-        adminUser.setUserName("ravi_6732");
-
-        adminUser.setUserLastName("Shankar");
-        adminUser.setUserPassword(passwordEncoder.encode("Shankar@5646"));
+        adminUser.setUserName("suku17");
+        adminUser.setUserFirstName("Sukanya");
+        adminUser.setUserLastName("Mandal");
+        adminUser.setUserPassword(passwordEncoder.encode("Suku@23"));
         Set<Role> adminRoles = new HashSet<>();
         adminRoles.add(adminRole);
         userRepository.saveAndFlush(adminUser);
 
         User user = new User();
-        adminUser.setUserName("sha_6732");
-        adminUser.setUserName("Rajat");
+        adminUser.setUserName("raj_6732");
+        adminUser.setUserName("Raj");
         adminUser.setUserLastName("Sharma");
-        adminUser.setUserPassword(passwordEncoder.encode("Rajat@673"));
+        adminUser.setUserPassword(passwordEncoder.encode("Raj@67"));
         Set<Role> userRoles = new HashSet<>();
         adminRoles.add(userRole);
         userRepository.saveAndFlush(user);

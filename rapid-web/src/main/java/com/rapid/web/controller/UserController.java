@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 
 @RestController
 @RequestMapping("/rapid/user")
@@ -22,14 +21,13 @@ public class UserController {
     }
     @GetMapping("/forAdmin")
     @PreAuthorize("hasRole('Admin')")
-   // @RolesAllowed("Admin")
 
     public String forAdmin(){
         return "This URL is only accessible to the admin";
     }
 
     @GetMapping({"/forUser"})
-    @PreAuthorize("hasAnyRole('User')")
+    @PreAuthorize("hasRole('User')")
     public String forUser(){
         return "This URL is only accessible to the user";
     }
