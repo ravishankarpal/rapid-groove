@@ -9,4 +9,6 @@ public class Constant {
 
     public static final Integer TOKEN_VALIDITY = 3600 * 5;
 
+    public static final String ORDER_PLACED = "Placed";
+
 }

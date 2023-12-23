@@ -1,8 +1,11 @@
 package com.rapid.security;
 
+import com.rapid.dao.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +18,9 @@ import static com.rapid.core.dto.Constant.TOKEN_VALIDITY;
 
 @Component
 public class JwtTokenDetails {
+
+    @Autowired
+    private UserRepository userRepository;
 
     // need to configure secret key
     public static final String SECRET_KEY = "CKsjknkdsKJKHSmcmxncj";
@@ -60,5 +66,19 @@ public class JwtTokenDetails {
                 .compact();
 
     }
+
+//    public String extractUserRole(String jwtToken) {
+//        Jws<Claims> claimsJws = Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(jwtToken);
+//        Claims body = claimsJws.getBody();
+//        String userName = body.get("sub", String.class);
+//        return userRepository.getUserRole(userName);
+//    }
+
+    public  String extractUserRole(){
+        String currentUser = JwtRequestFilter.CURRENT_USER;
+        return userRepository.getUserRole(currentUser);
+    }
+
+
 
 }
