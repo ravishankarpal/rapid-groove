@@ -50,8 +50,11 @@ public class WebSecurityChainFilterConfiguration  {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/authenticate","/rapid/user/register_user",
                             "rapid/role/create_role","/rapid/user/forAdmin",
-                            "/rapid/user/forUser").permitAll();
-                    auth.anyRequest().authenticated();
+                            "/rapid/user/forUser","/admin/**","/product/**",
+                            "/order/**").permitAll();
+                    //auth.anyRequest().authenticated();
+//                    auth.requestMatchers("/admin/**").hasAuthority("ADMIN")
+//                            .anyRequest().authenticated();
                 })
                 .httpBasic(Customizer.withDefaults());
         return http.build();

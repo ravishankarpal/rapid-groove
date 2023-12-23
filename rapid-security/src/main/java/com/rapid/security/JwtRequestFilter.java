@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,6 +30,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtService jwtService;
+
+    public static  String CURRENT_USER = "";
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse
             response, FilterChain filterChain) throws ServletException,
@@ -38,9 +41,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String userName  = null;
         if (header != null && header.startsWith("Bearer ")) {
             token = header.substring(7);
-
             try {
                 userName = jwtTokenDetails.getUserDetailFromToken(token);
+                CURRENT_USER = userName;
 
             } catch (IllegalArgumentException e) {
                 log.error("Unable to fetch jwt token", e);
