@@ -1,5 +1,6 @@
 package com.rapid.core.entity;
 
+import com.rapid.core.entity.order.Cart;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,6 +25,9 @@ public class User {
 
     @Column(name = "user_password")
     private String userPassword;
+
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+//    private Cart cart;
 
     // many user might have many roles
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
