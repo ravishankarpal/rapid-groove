@@ -66,11 +66,7 @@ public class OrderServiceImpl implements OrderService{
                                    cartItemRepository.deleteAllById(cartId);
                                 }
                                 orderDetails.add(orderDetail);
-                                //orderRepository.saveAndFlush(orderDetail);
-//                                log.info("Order for product: {}  by user: {} has been placed successfully!  " +
-//                                                "Order details : [ID: {}, Quantity: {}, Total Price: {}]",
-//                                        product.getProductName(), currentUser, orderDetail.getOrderId(),
-//                                        orderDetail.getTotalQuantity(), orderDetail.getTotalPrice());
+
                             },
                             () -> {
                                 throw new ProductDetailsNotFoundException("Product details not found for product ID: " +
@@ -80,8 +76,14 @@ public class OrderServiceImpl implements OrderService{
                 }
                 if (!orderDetails.isEmpty()){
                     orderRepository.saveAllAndFlush(orderDetails);
-                    isOrderPlaced = true;
+                    for(OrderDetails order : orderDetails) {
+                        log.info("Order for product: {}  by user: {} has been placed successfully!  " +
+                                        "Order details : [ID: {}, Quantity: {}, Total Price: {}]",
+                                order.getProduct().getProductName(), currentUser, order.getOrderId(),
+                                order.getTotalQuantity(), order.getTotalPrice());
+                    }
                     emailService.sendOrderConfirmationEmail(orderDetails);
+                    log.info("Email has been successfully sent to user :{}",currentUser);
                 }
             }else {
                 throw new UsernameNotFoundException("Invalid user");
