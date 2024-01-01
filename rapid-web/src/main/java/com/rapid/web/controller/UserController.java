@@ -20,8 +20,6 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
     @GetMapping("/forAdmin")
-    @PreAuthorize("hasRole('Admin')")
-
     public String forAdmin(){
         return "This URL is only accessible to the admin";
     }
