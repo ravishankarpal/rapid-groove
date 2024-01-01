@@ -2,6 +2,7 @@ package com.rapid.web.controller;
 
 
 import com.rapid.core.dto.OrderDto;
+import com.rapid.core.dto.OrderUpdate;
 import com.rapid.core.entity.order.OrderDetails;
 import com.rapid.service.OrderService;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
@@ -19,6 +20,8 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+
 
     @PostMapping(value = "/placeorder/{isSingleCartCheckOut}")
     public ResponseEntity<?> placeOrder(@PathVariable(name = "isSingleCartCheckOut") boolean isSingleCartCheckOut,
@@ -45,6 +48,20 @@ public class OrderController {
         List<OrderDetails> orderDetails = orderService.getMyOrderDetails();
         return new ResponseEntity<>(orderDetails,HttpStatus.OK);
     }
+
+
+//    @PostMapping(value = "/{orderId}/status")
+//    public ResponseEntity<String> updateOrderStatus(@PathVariable Integer orderId, @RequestParam String status) {
+//        // Perform your logic to update order status
+//
+//        // Notify clients about the order update
+//
+//        OrderUpdate orderUpdate = new OrderUpdate();
+//        orderUpdate.setOrderId(orderId);
+//        orderUpdate.setOrderStatus(status);
+//        orderTrackingService.sendOrderUpdate(orderUpdate);
+//        return ResponseEntity.ok("Order status updated successfully");
+//    }
 
 
 }
