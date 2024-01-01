@@ -10,11 +10,13 @@ import com.rapid.core.enums.OrderStatus;
 import com.rapid.dao.*;
 import com.rapid.security.JwtRequestFilter;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -38,10 +40,15 @@ public class OrderServiceImpl implements OrderService{
 
     @Autowired
     private CartRepository cartRepository;
+
+    @Autowired
+    private EmailService emailService;
     @Override
-    public void placeOrder(OrderDto orderDto, boolean isSingleCartCheckOut) {
+    public void placeOrder(OrderDto orderDto, boolean isSingleCartCheckOut) throws MessagingException {
             String currentUser = JwtRequestFilter.CURRENT_USER;
             Optional<User> user = userRepository.findById(currentUser);
+            List<OrderDetails> orderDetails = new ArrayList<>();
+            boolean isOrderPlaced = false;
             if (user.isPresent()) {
                 List<OrderProductQuantityDto> orderProductQuantities = orderDto.getOrderProductQuantities();
                 for (OrderProductQuantityDto orderProductQuantityDto : orderProductQuantities) {
@@ -58,17 +65,23 @@ public class OrderServiceImpl implements OrderService{
                                     cartRepository.deleteByUser_UserName(currentUser);
                                    cartItemRepository.deleteAllById(cartId);
                                 }
-                                orderRepository.saveAndFlush(orderDetail);
-                                log.info("Order for product: {}  by user: {} has been placed successfully!  " +
-                                                "Order details : [ID: {}, Quantity: {}, Total Price: {}]",
-                                        product.getProductName(), currentUser, orderDetail.getOrderId(),
-                                        orderDetail.getTotalQuantity(), orderDetail.getTotalPrice());
+                                orderDetails.add(orderDetail);
+                                //orderRepository.saveAndFlush(orderDetail);
+//                                log.info("Order for product: {}  by user: {} has been placed successfully!  " +
+//                                                "Order details : [ID: {}, Quantity: {}, Total Price: {}]",
+//                                        product.getProductName(), currentUser, orderDetail.getOrderId(),
+//                                        orderDetail.getTotalQuantity(), orderDetail.getTotalPrice());
                             },
                             () -> {
                                 throw new ProductDetailsNotFoundException("Product details not found for product ID: " +
                                         orderProductQuantityDto.getProductId());
                             }
                     );
+                }
+                if (!orderDetails.isEmpty()){
+                    orderRepository.saveAllAndFlush(orderDetails);
+                    isOrderPlaced = true;
+                    emailService.sendOrderConfirmationEmail(orderDetails);
                 }
             }else {
                 throw new UsernameNotFoundException("Invalid user");
@@ -99,5 +112,9 @@ public class OrderServiceImpl implements OrderService{
                 user
         );
     }
+
+
+
+
 
 }
