@@ -2,16 +2,16 @@ package com.rapid.web.controller;
 
 
 import com.rapid.core.dto.OrderDto;
+import com.rapid.core.entity.order.OrderDetails;
 import com.rapid.service.OrderService;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/order")
@@ -20,10 +20,11 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping(value = "/placeorder")
-    public ResponseEntity<?> placeOrder(@RequestBody OrderDto orderDto){
+    @PostMapping(value = "/placeorder/{isSingleCartCheckOut}")
+    public ResponseEntity<?> placeOrder(@PathVariable(name = "isSingleCartCheckOut") boolean isSingleCartCheckOut,
+                                        @RequestBody OrderDto orderDto){
         try {
-            orderService.placeOrder(orderDto);
+            orderService.placeOrder(orderDto,isSingleCartCheckOut);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (UsernameNotFoundException e) {
@@ -37,6 +38,12 @@ public class OrderController {
             return new ResponseEntity<>("Internal Server Error",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping(value = "/myorder/details")
+    public ResponseEntity<?> getMyOrderDetails(){
+        List<OrderDetails> orderDetails = orderService.getMyOrderDetails();
+        return new ResponseEntity<>(orderDetails,HttpStatus.OK);
     }
 
 

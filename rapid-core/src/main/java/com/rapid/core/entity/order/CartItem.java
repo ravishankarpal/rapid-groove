@@ -1,5 +1,6 @@
 package com.rapid.core.entity.order;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rapid.core.entity.product.Products;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties({"cart"})
+
 public class CartItem {
 
     @Id

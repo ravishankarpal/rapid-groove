@@ -2,6 +2,7 @@ package com.rapid.service;
 
 import com.rapid.core.entity.product.ImageModel;
 import com.rapid.core.entity.product.Products;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -13,7 +14,9 @@ public interface ProductService {
 
     Set<ImageModel> uploadImage(MultipartFile[] multipartFiles) throws IOException;
 
-   List<Products> getAllProducts();
+    Page<Products> getAllProducts(Integer pageNumber, String searchKey);
 
     void deleteProduct(Integer productId);
+
+    List<Products> getProductDetails(boolean isSingleProductCheckOut, Integer productId);
 }

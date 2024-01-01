@@ -5,6 +5,7 @@ import com.rapid.core.entity.User;
 import com.rapid.core.entity.order.Cart;
 import com.rapid.core.entity.order.CartItem;
 import com.rapid.core.entity.product.Products;
+import com.rapid.dao.CartItemRepository;
 import com.rapid.dao.CartRepository;
 import com.rapid.dao.ProductRepository;
 import com.rapid.dao.UserRepository;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +33,9 @@ public class CartServiceImpl implements CartService{
 
     @Autowired
     private CartRepository cartRepository ;
+
+    @Autowired
+    private CartItemRepository cartItemRepository ;
 
     @Autowired
     private JwtTokenDetails jwtTokenDetails;
@@ -71,5 +76,18 @@ public class CartServiceImpl implements CartService{
             log.info("Product Details not found!");
             throw  new ProductDetailsNotFoundException("Product Details not found!");
         }
+    }
+
+    @Override
+    public List<CartItem> getCartDetails() {
+        String userName = JwtRequestFilter.CURRENT_USER;
+        List<CartItem> cartItems =  cartItemRepository.getCartDetails(userName);
+        return  cartItems;
+    }
+
+    @Override
+    public void deleteCartItem(Integer cartId) {
+        cartRepository.deleteById(cartId);
+        cartItemRepository.deleteById(cartId);
     }
 }
