@@ -83,16 +83,6 @@ public class CartServiceImpl implements CartService{
         String userName = JwtRequestFilter.CURRENT_USER;
         List<CartItem> cartItems =  cartItemRepository.getCartDetails(userName);
         return  cartItems;
-//        Map<Long, List<CartItem>> cartItemsByCartId = cartItems.stream()
-//                .collect(Collectors.groupingBy(cartItem -> cartItem.getCart().getId().longValue()));
-//        List<CartDetails> allDetails = cartItemsByCartId.entrySet().stream()
-//                .map(entry -> {
-//                    CartDetails cartDetails = new CartDetails();
-//                    cartDetails.setCartId(entry.getKey().intValue());
-//                    cartDetails.setCartItems(entry.getValue());
-//                    return cartDetails;
-//                })
-//                .collect(Collectors.toList());
     }
 
     @Override
