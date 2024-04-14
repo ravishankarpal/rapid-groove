@@ -44,7 +44,7 @@ public class JwtServiceImpl implements UserDetailsService,JwtService {
         if (userOptional.isPresent()){
             User user = userOptional.get();
             return new org.springframework.security.core.userdetails.User(
-                    user.getUserName(),user.getUserPassword(),
+                    user.getEmail(),user.getPassword(),
                     getAuthorities(user)
             );
         }else {
@@ -62,6 +62,7 @@ public class JwtServiceImpl implements UserDetailsService,JwtService {
         final  UserDetails userDetails = loadUserByUsername(userName);
         String generatedToken  = jwtTokenDetails.generateJwtToken(userDetails);
         Optional<User> userOptional  = userRepository.findById(userName);
+        log.info("Success");
         return userOptional.map(user -> new JwtResponse(user, generatedToken)).
                 orElse(null);
 

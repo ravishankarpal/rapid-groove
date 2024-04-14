@@ -40,43 +40,43 @@ public class CartServiceImpl implements CartService{
     @Autowired
     private JwtTokenDetails jwtTokenDetails;
     @Override
-    public void addToCart(Integer productId) {
-        log.info("going to add product in cart for productId :{}",productId);
-        Optional<Products> products = productRepository.findById(productId);
-        String userName  = null;
-        if (products.isPresent()){
-            userName =  JwtRequestFilter.CURRENT_USER;
-            Optional<User> user = userRepository.findById(userName);
-            if (user.isPresent()){
-                log.info("going to add product in cart for productId :{} by user :{}"
-                        ,productId,user.get().getUserName());
-                List<Cart> cart = cartRepository.findCartByUserId(user.get().getUserName());
-                if(CollectionUtils.isEmpty(cart)){
-                    cart.add(new Cart(user.get()));
-                }
-                List<CartItem> existingItem = cart.get(0).getCartItems().stream()
-                        .filter(item -> item.getProducts().equals(products.get()))
-                        .toList();
+        public void addToCart(Integer productId) {
+            log.info("going to add product in cart for productId :{}",productId);
+            Optional<Products> products = productRepository.findById(productId);
+            String userName  = null;
+            if (products.isPresent()){
+                userName =  JwtRequestFilter.CURRENT_USER;
+                Optional<User> user = userRepository.findById(userName);
+                if (user.isPresent()){
+                    log.info("going to add product in cart for productId :{} by user :{}"
+                            ,productId,user.get().getEmail());
+                    List<Cart> cart = cartRepository.findCartByUserId(user.get().getEmail());
+                    if(CollectionUtils.isEmpty(cart)){
+                        cart.add(new Cart(user.get()));
+                    }
+                    List<CartItem> existingItem = cart.get(0).getCartItems().stream()
+                            .filter(item -> item.getProducts().equals(products.get()))
+                            .toList();
 
-                if (!CollectionUtils.isEmpty(existingItem)) {
-                    existingItem.get(0).setQuantity(existingItem.get(0).getQuantity() + 1);
-                } else {
-                    CartItem cartItem = new CartItem();
-                    cartItem.setProducts(products.get());
-                    cartItem.setQuantity(1);
-                    cartItem.setCart(cart.get(0));
-                    cart.get(0).getCartItems().add(cartItem);
+                    if (!CollectionUtils.isEmpty(existingItem)) {
+                        existingItem.get(0).setQuantity(existingItem.get(0).getQuantity() + 1);
+                    } else {
+                        CartItem cartItem = new CartItem();
+                        cartItem.setProducts(products.get());
+                        cartItem.setQuantity(1);
+                        cartItem.setCart(cart.get(0));
+                        cart.get(0).getCartItems().add(cartItem);
+                    }
+                    cartRepository.saveAndFlush(cart.get(0));
+                    log.info("Product has been successfully added in user cart username :{} cartDetails :{}",
+                            userName,cart);
                 }
-                cartRepository.saveAndFlush(cart.get(0));
-                log.info("Product has been successfully added in user cart username :{} cartDetails :{}",
-                        userName,cart);
+            }
+            else{
+                log.info("Product Details not found!");
+                throw  new ProductDetailsNotFoundException("Product Details not found!");
             }
         }
-        else{
-            log.info("Product Details not found!");
-            throw  new ProductDetailsNotFoundException("Product Details not found!");
-        }
-    }
 
     @Override
     public List<CartItem> getCartDetails() {

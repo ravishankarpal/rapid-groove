@@ -10,4 +10,6 @@ import java.nio.ByteBuffer;
 @Repository
 public interface RoleRepository extends JpaRepository<Role, String> {
 
+
+    Role findByRoleName(String user);
 }

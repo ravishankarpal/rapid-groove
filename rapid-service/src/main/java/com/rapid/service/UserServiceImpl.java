@@ -4,8 +4,12 @@ import com.rapid.core.entity.Role;
 import com.rapid.core.entity.User;
 import com.rapid.dao.RoleRepository;
 import com.rapid.dao.UserRepository;
+import com.rapid.security.service.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,18 +28,25 @@ public class UserServiceImpl implements  UserService{
     @Autowired
     private RoleRepository roleRepository;
 
+    @Autowired
+    private JwtService jwtService;
+
 
     @Override
     public void registerUser(User user) {
         User us = new User();
-        Role role = roleRepository.findById("User").get();
-        Set<Role> userRole  = new HashSet<>();
-        userRole.add(role);
-        us.setUserName(user.getUserName());
-        us.setUserFirstName(user.getUserFirstName());
-        us.setUserLastName(user.getUserLastName());
-        us.setRole(userRole);
-        us.setUserPassword(passwordEncoder.encode(user.getUserPassword()));
+        Role defaultRole = roleRepository.findByRoleName("User");
+        Set<Role> roles = new HashSet<>();
+        if (user.getRole() == null || user.getRole().isEmpty()) {
+            roles.add(defaultRole);
+            user.setRole(roles);
+        }else{
+            roles = user.getRole();
+        }
+        us.setName(user.getName());
+        us.setEmail(user.getEmail());
+        us.setRole(roles);
+        us.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.saveAndFlush(us);
 
     }
@@ -53,19 +64,18 @@ public class UserServiceImpl implements  UserService{
         roleRepository.saveAndFlush(userRole);
 
         User adminUser = new User();
-        adminUser.setUserName("suku17");
-        adminUser.setUserFirstName("Sukanya");
-        adminUser.setUserLastName("Mandal");
-        adminUser.setUserPassword(passwordEncoder.encode("Suku@23"));
+        adminUser.setEmail("suku17@gmail.com");
+        adminUser.setName("Sukanya");
+
+        adminUser.setPassword(passwordEncoder.encode("Suku@23"));
         Set<Role> adminRoles = new HashSet<>();
         adminRoles.add(adminRole);
         userRepository.saveAndFlush(adminUser);
 
         User user = new User();
-        adminUser.setUserName("raj_6732");
-        adminUser.setUserName("Raj");
-        adminUser.setUserLastName("Sharma");
-        adminUser.setUserPassword(passwordEncoder.encode("Raj@67"));
+        adminUser.setEmail("raj6732@gmail.com");
+        adminUser.setName("Raj");
+        adminUser.setPassword(passwordEncoder.encode("Raj@67"));
         Set<Role> userRoles = new HashSet<>();
         adminRoles.add(userRole);
         userRepository.saveAndFlush(user);
