@@ -4,6 +4,7 @@ import com.rapid.core.entity.order.CartItem;
 import com.rapid.core.entity.product.ImageModel;
 import com.rapid.core.entity.product.Products;
 import com.rapid.dao.CartItemRepository;
+import com.rapid.dao.ImageModelRepository;
 import com.rapid.dao.ProductRepository;
 import com.rapid.security.JwtRequestFilter;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,9 @@ public class ProductServiceImpl implements ProductService{
 
     @Autowired
     CartItemRepository cartItemRepository;
+
+    @Autowired
+    private ImageModelRepository imageModelRepository;
     @Override
     public Products addNewProduct(Products products) {
         log.info("Product: {} has been added by admin",products.getProductName());
@@ -38,16 +42,18 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public Set<ImageModel> uploadImage(MultipartFile [] multipartFiles) throws IOException {
-        Set<ImageModel> imageModels = new HashSet<>();
+        Set<ImageModel> imageModels  = new HashSet<>();
         for (MultipartFile file : multipartFiles){
             ImageModel imageModel = new ImageModel(
                     file.getOriginalFilename(),
                     file.getContentType(),
                     file.getBytes()
             );
+            imageModelRepository.saveAndFlush(imageModel);
             imageModels.add(imageModel);
         }
         return imageModels;
+
     }
 
     @Override
@@ -83,5 +89,12 @@ public class ProductServiceImpl implements ProductService{
             return  cartItems.stream().map(CartItem::getProducts).collect(Collectors.toList());
 
         }
+    }
+
+    @Override
+    public byte[] getImage(String imageName) {
+        imageName = imageName+".jpg";
+        log.info("Image fetched successfully from Database");
+        return imageModelRepository.findByName(imageName).getPicByte();
     }
 }

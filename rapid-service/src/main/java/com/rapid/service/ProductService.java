@@ -19,4 +19,6 @@ public interface ProductService {
     void deleteProduct(Integer productId);
 
     List<Products> getProductDetails(boolean isSingleProductCheckOut, Integer productId);
+
+    byte[] getImage(String imageName);
 }
