@@ -20,7 +20,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.rapid.dao</groupId>
+            <groupId>com.rapid.service</groupId>
             <artifactId>rapid-service</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
@@ -29,7 +29,33 @@
             <artifactId>javax.annotation-api</artifactId>
             <version>1.2</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.thymeleaf</groupId>
+            <artifactId>thymeleaf</artifactId>
+            <version>3.1.2.RELEASE</version>
+        </dependency>
+
     </dependencies>
+
+    <build>
+        <pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+<!--                <version>2.5.4</version>-->
+                <configuration>
+                    <cleanCache>true</cleanCache>
+                    <mainClass>com.rapid.web.RapidGrooveOperations</mainClass>
+
+                </configuration>
+            </plugin>
+        </plugins>
+        </pluginManagement>
+    </build>
+
 
 
 

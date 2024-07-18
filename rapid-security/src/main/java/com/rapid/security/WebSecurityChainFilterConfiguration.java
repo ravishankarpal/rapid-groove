@@ -53,7 +53,7 @@ public class WebSecurityChainFilterConfiguration  {
 //                            "/rapid/user/forUser","/admin/**","/product/**",
 //                            "/order/**","/cart/**").permitAll();
                     auth.requestMatchers("/authenticate","rapid/user/register_user",
-                            "/admin/product/**","/product/**").permitAll();
+                            "/admin/product/**","/product/**","/index","/about","/").permitAll();
                 })
                 .httpBasic(Customizer.withDefaults());
         return http.build();

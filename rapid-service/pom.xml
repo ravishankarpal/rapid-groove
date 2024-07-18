@@ -9,7 +9,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.rapid.dao</groupId>
+    <groupId>com.rapid.service</groupId>
     <artifactId>rapid-service</artifactId>
 
     <dependencies>
