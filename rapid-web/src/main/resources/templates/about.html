@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Your E-commerce Store</title>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<main class="container mt-4">
+    <h1 class="mb-4">About Us</h1>
+    <section class="about-content">
+        <p class="lead">Your company description goes here.</p>
+        <h2 class="mt-4">Our Mission</h2>
+        <p>Your mission statement goes here.</p>
+        <h2 class="mt-4">Our Team</h2>
+        <div class="row">
+            <!-- Loop through team members -->
+            <div th:each="member : ${teamMembers}" class="col-md-4 mb-4">
+                <div class="card">
+                    <img th:src="${member.imageUrl}" class="card-img-top" th:alt="${member.name}">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${member.name}"></h5>
+                        <p class="card-text" th:text="${member.position}"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

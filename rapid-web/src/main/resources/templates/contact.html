@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Your E-commerce Store</title>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<main class="container mt-4">
+    <h1 class="mb-4">Contact Us</h1>
+    <div class="row">
+        <section class="col-md-6 contact-form">
+            <form th:action="@{/contact}" method="post" th:object="${contactForm}">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" class="form-control" id="email" th:field="*{email}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="subject" class="form-label">Subject:</label>
+                    <input type="text" class="form-control" id="subject" th:field="*{subject}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message:</label>
+                    <textarea class="form-control" id="message" th:field="*{message}" rows="4" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </section>
+        <section class="col-md-6 contact-info">
+            <h2>Our Information</h2>
+            <p><strong>Address:</strong> Your Company Address</p>
+            <p><strong>Phone:</strong> Your Company Phone</p>
+            <p><strong>Email:</strong> your@email.com</p>
+        </section>
+    </div>
+</main>
+
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>

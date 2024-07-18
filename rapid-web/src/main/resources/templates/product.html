@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${product.name} + ' - Your E-commerce Store'"></title>
+</head>
+<body>
+<div th:replace="fragments/header :: header"></div>
+
+<main class="container mt-4">
+    <div class="row">
+        <div class="col-md-6">
+            <img th:src="${product.imageUrl}" class="img-fluid" th:alt="${product.name}">
+        </div>
+        <div class="col-md-6">
+            <h1 th:text="${product.name}"></h1>
+            <p class="lead" th:text="${'$' + product.price}"></p>
+            <p th:text="${product.description}"></p>
+            <form th:action="@{/cart/add}" method="post" class="mb-3">
+                <input type="hidden" name="productId" th:value="${product.id}">
+                <div class="mb-3">
+                    <label for="quantity" class="form-label">Quantity:</label>
+                    <input type="number" class="form-control" id="quantity" name="quantity" value="1" min="1" style="width: 70px;">
+                </div>
+                <button type="submit" class="btn btn-primary">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+    <section class="mt-5">
+        <h2>Related Products</h2>
+        <div class="row">
+            <div th:each="relatedProduct : ${relatedProducts}" class="col-md-4 mb-4">
+                <div class="card">
+                    <img th:src="${relatedProduct.imageUrl}" class="card-img-top" th:alt="${relatedProduct.name}">
+                    <div class="card-body">
+                        <h5 class="card-title" th:text="${relatedProduct.name}"></h5>
+                        <p class="card-text" th:text="${'$' + relatedProduct.price}"></p>
+                        <a th:href="@{'/product/' + ${relatedProduct.id}}" class="btn btn-primary">View Product</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<div th:replace="fragments/footer :: footer"></div>
+</body>
+</html>
