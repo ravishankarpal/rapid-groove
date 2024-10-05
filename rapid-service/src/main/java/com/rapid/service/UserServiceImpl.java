@@ -1,14 +1,18 @@
 package com.rapid.service;
 
+import com.rapid.core.dto.LoginDto;
 import com.rapid.core.entity.Role;
 import com.rapid.core.entity.User;
+import com.rapid.core.exception.InvalidCredentialsException;
 import com.rapid.dao.RoleRepository;
 import com.rapid.dao.UserRepository;
 import com.rapid.security.service.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -30,6 +34,9 @@ public class UserServiceImpl implements  UserService{
 
     @Autowired
     private JwtService jwtService;
+
+    @Autowired
+    UserDetailsService userDetailsService;
 
 
     @Override
@@ -79,6 +86,16 @@ public class UserServiceImpl implements  UserService{
         Set<Role> userRoles = new HashSet<>();
         adminRoles.add(userRole);
         userRepository.saveAndFlush(user);
+
+    }
+
+    @Override
+    public UserDetails loginUser(LoginDto loginDto){
+        UserDetails userDetails = userDetailsService.loadUserByUsername(loginDto.getEmail());
+        if (userDetails == null || !passwordEncoder.matches(loginDto.getPassword(), userDetails.getPassword())) {
+            throw new InvalidCredentialsException("Invalid username or password");
+        }
+        return userDetails;
 
     }
 

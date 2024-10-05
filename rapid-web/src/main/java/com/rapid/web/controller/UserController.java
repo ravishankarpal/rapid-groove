@@ -1,4 +1,5 @@
 package com.rapid.web.controller;
+import com.rapid.core.dto.LoginDto;
 import com.rapid.core.entity.Role;
 import com.rapid.core.entity.User;
 import com.rapid.service.UserService;
@@ -24,6 +25,14 @@ public class UserController {
         userService.registerUser(user);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
+
+
+    @GetMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody LoginDto loginDto){
+       UserDetails userDetails =  userService.loginUser(loginDto);
+        return new ResponseEntity<>(userDetails, HttpStatus.OK);
+    }
+
     @GetMapping("/forAdmin")
     public String forAdmin(){
         return "This URL is only accessible to the admin";

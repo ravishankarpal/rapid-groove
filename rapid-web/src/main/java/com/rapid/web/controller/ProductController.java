@@ -26,6 +26,13 @@ public class ProductController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/details/categories")
+    public ResponseEntity<?> getCategoriesProducts(@RequestParam(defaultValue = "0") Integer pageNumber,
+                                            @RequestParam(defaultValue = StringUtils.EMPTY) String searchKey){
+        Page<Products> products = productService.getCategoriesProducts(pageNumber,searchKey);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/getProductDetails/{isSingleProductCheckOut}/{productId}")
     public ResponseEntity<?> getProductDetails(@PathVariable(name = "isSingleProductCheckOut")
               boolean isSingleProductCheckOut,

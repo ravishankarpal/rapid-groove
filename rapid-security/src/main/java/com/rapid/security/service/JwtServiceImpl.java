@@ -62,7 +62,7 @@ public class JwtServiceImpl implements UserDetailsService,JwtService {
         final  UserDetails userDetails = loadUserByUsername(userName);
         String generatedToken  = jwtTokenDetails.generateJwtToken(userDetails);
         Optional<User> userOptional  = userRepository.findById(userName);
-        log.info("Success");
+        log.info("Authentication Success");
         return userOptional.map(user -> new JwtResponse(user, generatedToken)).
                 orElse(null);
 

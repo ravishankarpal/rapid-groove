@@ -97,4 +97,10 @@ public class ProductServiceImpl implements ProductService{
         log.info("Image fetched successfully from Database");
         return imageModelRepository.findByName(imageName).getPicByte();
     }
+
+    @Override
+    public Page<Products> getCategoriesProducts(Integer pageNumber, String searchKey) {
+        Pageable pageable = PageRequest.of(pageNumber,20);
+        return productRepository.findByProductCategory(searchKey,pageable);
+    }
 }

@@ -30,6 +30,10 @@ public class Products {
     @Column(name = "product_actual_price")
     private Double productActualPrice;
 
+
+    @Column(name = "product_category")
+    private String productCategory;
+
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinTable(name = "PRODUCT_IMAGES",
             joinColumns = {

@@ -21,4 +21,6 @@ public interface ProductService {
     List<Products> getProductDetails(boolean isSingleProductCheckOut, Integer productId);
 
     byte[] getImage(String imageName);
+
+    Page<Products> getCategoriesProducts(Integer pageNumber, String searchKey);
 }
