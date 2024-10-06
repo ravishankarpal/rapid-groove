@@ -1,9 +1,13 @@
 package com.rapid.web.controller;
 
+import com.rapid.core.dto.DeliveryAvailabilityDTO;
+import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.product.ImageModel;
 import com.rapid.core.entity.product.Products;
 import com.rapid.security.JwtTokenDetails;
 import com.rapid.service.ProductService;
+import com.rapid.service.admin.AdminService;
+import com.rapid.service.exception.RapidGrooveException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,6 +28,9 @@ public class AdminController {
 
     @Autowired
     private JwtTokenDetails jwtTokenDetails;
+
+    @Autowired
+    private AdminService adminService;
 
     @PostMapping(value = "/product/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> addNewProduct(@RequestPart("product") Products products,
@@ -81,5 +88,11 @@ public class AdminController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
+    }
+
+    @PostMapping(value = "/update/delivery")
+    public ResponseEntity<?> updateDeliveryAvailability(@RequestBody DeliveryAvailabilityDTO deliveryAvailability) throws RapidGrooveException {
+        DeliveryAvailability updateDeliveryAvailability = adminService.updateDeliveryAvailability(deliveryAvailability);
+        return new ResponseEntity<>(updateDeliveryAvailability, HttpStatus.OK);
     }
 }

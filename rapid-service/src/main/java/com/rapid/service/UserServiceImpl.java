@@ -1,13 +1,17 @@
 package com.rapid.service;
 
 import com.rapid.core.dto.LoginDto;
+import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.Role;
 import com.rapid.core.entity.User;
 import com.rapid.core.exception.InvalidCredentialsException;
+import com.rapid.dao.DeliveryAvailabilityRepository;
 import com.rapid.dao.RoleRepository;
 import com.rapid.dao.UserRepository;
 import com.rapid.security.service.JwtService;
+import com.rapid.service.exception.RapidGrooveException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +41,9 @@ public class UserServiceImpl implements  UserService{
 
     @Autowired
     UserDetailsService userDetailsService;
+
+    @Autowired
+    DeliveryAvailabilityRepository deliveryAvailabilityRepository;
 
 
     @Override
@@ -97,6 +104,17 @@ public class UserServiceImpl implements  UserService{
         }
         return userDetails;
 
+    }
+
+    @Override
+    public DeliveryAvailability checkDeliveryAvailableOrNot(String pinCode) {
+
+        DeliveryAvailability deliveryAvailability = deliveryAvailabilityRepository.findByPinCode(pinCode);
+        if (deliveryAvailability != null && BooleanUtils.toBoolean(deliveryAvailability.getDeliveryAvailable())) {
+            return deliveryAvailability;
+        }
+
+        return  null;
     }
 
 }

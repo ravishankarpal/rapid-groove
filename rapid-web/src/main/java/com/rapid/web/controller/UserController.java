@@ -1,8 +1,10 @@
 package com.rapid.web.controller;
 import com.rapid.core.dto.LoginDto;
+import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.Role;
 import com.rapid.core.entity.User;
 import com.rapid.service.UserService;
+import com.rapid.service.exception.RapidGrooveException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,4 +50,17 @@ public class UserController {
     public void initiateRolesAndUser(){
         userService.initiateRolesAndUser();
     }
+
+    @GetMapping(value = "/check/delivery/{pinCode}")
+    public ResponseEntity<?> checkDeliveryAvailableOrNot(@PathVariable("pinCode") String pinCode){
+        DeliveryAvailability isDeliveryAvailableOrNot = userService.checkDeliveryAvailableOrNot(pinCode);
+        if (isDeliveryAvailableOrNot != null) {
+            return new ResponseEntity<>(isDeliveryAvailableOrNot, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(new RapidGrooveException("Delivery not available at pincode - "+  pinCode), HttpStatus.NOT_FOUND);
+        }
+    }
+
+
 }

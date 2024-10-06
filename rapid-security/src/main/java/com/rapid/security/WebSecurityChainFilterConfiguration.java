@@ -52,8 +52,8 @@ public class WebSecurityChainFilterConfiguration  {
 //                            "rapid/role/create_role","/rapid/user/forAdmin",
 //                            "/rapid/user/forUser","/admin/**","/product/**",
 //                            "/order/**","/cart/**").permitAll();
-                    auth.requestMatchers("/authenticate","rapid/user/register_user",
-                            "/admin/product/**","/product/**").permitAll();
+                    auth.requestMatchers("/authenticate","rapid/user/**",
+                            "/admin/product/**","/product/**","admin/**").permitAll();
                 })
                 .httpBasic(Customizer.withDefaults());
         return http.build();
