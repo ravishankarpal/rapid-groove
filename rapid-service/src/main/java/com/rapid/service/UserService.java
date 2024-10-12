@@ -1,6 +1,7 @@
 package com.rapid.service;
 
 import com.rapid.core.dto.LoginDto;
+import com.rapid.core.dto.UserAddressDTO;
 import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.User;
 import com.rapid.security.service.JwtService;
@@ -21,4 +22,6 @@ public interface UserService {
     UserDetails loginUser(LoginDto loginDto);
 
     DeliveryAvailability checkDeliveryAvailableOrNot(String pinCode) ;
+
+    void saveUserAddressDetails(UserAddressDTO userAddressDTO);
 }

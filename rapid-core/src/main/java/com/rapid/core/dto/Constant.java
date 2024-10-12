@@ -11,4 +11,6 @@ public class Constant {
 
     public static final String ORDER_PLACED = "Placed";
 
+    public static final String DELIVERY_FEE_THRESHOLD  = "delivery_fee_threshold";
+
 }

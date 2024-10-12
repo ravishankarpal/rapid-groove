@@ -1,17 +1,22 @@
 package com.rapid.service;
 
 import com.rapid.core.dto.LoginDto;
+import com.rapid.core.dto.UserAddressDTO;
 import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.Role;
 import com.rapid.core.entity.User;
+import com.rapid.core.entity.UserAddress;
 import com.rapid.core.exception.InvalidCredentialsException;
 import com.rapid.dao.DeliveryAvailabilityRepository;
 import com.rapid.dao.RoleRepository;
+import com.rapid.dao.UserAddressRepository;
 import com.rapid.dao.UserRepository;
+import com.rapid.security.JwtRequestFilter;
 import com.rapid.security.service.JwtService;
 import com.rapid.service.exception.RapidGrooveException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +27,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -40,10 +47,13 @@ public class UserServiceImpl implements  UserService{
     private JwtService jwtService;
 
     @Autowired
-    UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Autowired
-    DeliveryAvailabilityRepository deliveryAvailabilityRepository;
+    private DeliveryAvailabilityRepository deliveryAvailabilityRepository;
+
+    @Autowired
+    private UserAddressRepository userAddressRepository;
 
 
     @Override
@@ -115,6 +125,26 @@ public class UserServiceImpl implements  UserService{
         }
 
         return  null;
+    }
+
+    @Override
+    public void saveUserAddressDetails(UserAddressDTO userAddressDTO){
+        String userName = JwtRequestFilter.CURRENT_USER;
+        log.info("Request received to save user address details for user name {}", userName);
+
+        if(Objects.nonNull(userAddressDTO) && StringUtils.isNotBlank( userName)) {
+            UserAddress userAddress = new UserAddress(userAddressDTO);
+            Optional<User> user=  userRepository.findById(userName);
+            if (user.isPresent()){
+                userAddress.setUser(user.get());
+                userAddressRepository.saveAndFlush(userAddress);
+            }else {
+                log.info("User details add successfully");
+            }
+        }else{
+            log.info("User details can not be blank");
+        }
+
     }
 
 }

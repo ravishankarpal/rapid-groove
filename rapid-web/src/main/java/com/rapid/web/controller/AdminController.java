@@ -1,6 +1,7 @@
 package com.rapid.web.controller;
 
 import com.rapid.core.dto.DeliveryAvailabilityDTO;
+import com.rapid.core.dto.ProductDetailDTO;
 import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.product.ImageModel;
 import com.rapid.core.entity.product.Products;
@@ -94,5 +95,15 @@ public class AdminController {
     public ResponseEntity<?> updateDeliveryAvailability(@RequestBody DeliveryAvailabilityDTO deliveryAvailability) throws RapidGrooveException {
         DeliveryAvailability updateDeliveryAvailability = adminService.updateDeliveryAvailability(deliveryAvailability);
         return new ResponseEntity<>(updateDeliveryAvailability, HttpStatus.OK);
+    }
+
+
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> addNewProductByAdmin(@RequestPart("product") ProductDetailDTO productDetailDTO,
+                                                @RequestPart("imageFile") MultipartFile[] file) throws RapidGrooveException {
+            Products products = productService.addNewProductByAdmin(productDetailDTO, file);
+            return new ResponseEntity<>(products,HttpStatus.OK);
+
+
     }
 }

@@ -2,9 +2,12 @@ package com.rapid.core.entity.product;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.rapid.core.dto.ProductDetailDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.commons.lang3.BooleanUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -13,12 +16,13 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "products")
+@NoArgsConstructor
 public class Products {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer productId;
+    @Column(name = "product_id")
+    private Integer productId ;
 
     @Column(name = "product_name")
     private String productName;
@@ -26,6 +30,8 @@ public class Products {
     @Column(name = "product_description")
     private String productDescription;
 
+
+    // need to remove
     @Column(name = "product_discount_price")
     private Double productDiscountPrice;
 
@@ -55,23 +61,32 @@ public class Products {
     @Column(name = "reviews_count")
     private Integer reviewsCount;
 
-    @Column(name = "discount_percentage")
-    private Integer discountPercentage;
-
-    @Column(name = "available_sizes")
-    private String availableSizes;
 
     @Column(name = "is_promotion_req")
-    private boolean isPromotionRequired;
+    private Integer isPromotionRequired;
 
     @Column(name = "promotions")
     private String promotions;
 
-    @Column(name = "is_tax_included")
-    private boolean isTaxIncluded;
 
-    @Column(name = "size")
-    private String size;
+
+
+    public Products(ProductDetailDTO productDetailDTO){
+        this.productId = productDetailDTO.getProductId();
+        this.productName = productDetailDTO.getProductName();
+        this.productDescription = productDetailDTO.getProductDescription();
+        this.productCategory = productDetailDTO.getProductCategory();
+        this.productRating = productDetailDTO.getProductRating();
+        this.ratingsCount = productDetailDTO.getRatingsCount();
+        this.reviewsCount = productDetailDTO.getReviewsCount();
+        this.isPromotionRequired = productDetailDTO.isPromotionRequired() ? 1 :0;
+        if(this.isPromotionRequired == 1) {
+            this.promotions = productDetailDTO.getPromotions();
+        }
+
+
+
+    }
 
 
 

@@ -1,5 +1,6 @@
 package com.rapid.web.controller;
 import com.rapid.core.dto.LoginDto;
+import com.rapid.core.dto.UserAddressDTO;
 import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.Role;
 import com.rapid.core.entity.User;
@@ -61,6 +62,16 @@ public class UserController {
             return new ResponseEntity<>(new RapidGrooveException("Delivery not available at pincode - "+  pinCode), HttpStatus.NOT_FOUND);
         }
     }
+
+    @PostMapping(value = "/save/address")
+    public ResponseEntity<?> saveUserAddressDetails(@RequestBody UserAddressDTO userAddressDTO){
+        userService.saveUserAddressDetails(userAddressDTO);
+     return  new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+
+
 
 
 }
