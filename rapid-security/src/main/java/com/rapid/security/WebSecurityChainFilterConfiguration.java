@@ -48,10 +48,12 @@ public class WebSecurityChainFilterConfiguration  {
          http.cors(Customizer.withDefaults());
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers("/authenticate","/rapid/user/register_user",
-                            "rapid/role/create_role","/rapid/user/forAdmin",
-                            "/rapid/user/forUser","/admin/**","/product/**",
-                            "/order/**","/cart/**").permitAll();
+//                    auth.requestMatchers("/authenticate","/rapid/user/register_user",
+//                            "rapid/role/create_role","/rapid/user/forAdmin",
+//                            "/rapid/user/forUser","/admin/**","/product/**",
+//                            "/order/**","/cart/**").permitAll();
+                    auth.requestMatchers("/authenticate","rapid/user/**",
+                            "/admin/product/**","/product/**","admin/**","rapid/cart/**").permitAll();
                 })
                 .httpBasic(Customizer.withDefaults());
         return http.build();

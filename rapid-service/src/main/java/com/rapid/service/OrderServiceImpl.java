@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,8 +44,11 @@ public class OrderServiceImpl implements OrderService{
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private PdfService pdfService;
     @Override
-    public void placeOrder(OrderDto orderDto, boolean isSingleCartCheckOut) throws MessagingException {
+    public void placeOrder(OrderDto orderDto, boolean isSingleCartCheckOut) throws MessagingException, IOException {
             String currentUser = JwtRequestFilter.CURRENT_USER;
             Optional<User> user = userRepository.findById(currentUser);
             List<OrderDetails> orderDetails = new ArrayList<>();
@@ -62,7 +66,8 @@ public class OrderServiceImpl implements OrderService{
                                     List<Integer> cartId = carts.stream()
                                             .map(Cart::getId)
                                             .toList();
-                                    cartRepository.deleteByUser_UserName(currentUser);
+                                   // cartRepository.deleteByUser_UserName(currentUser);
+                                    cartRepository.deleteByUser_Email(currentUser);
                                    cartItemRepository.deleteAllById(cartId);
                                 }
                                 orderDetails.add(orderDetail);
@@ -93,7 +98,7 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public List<OrderDetails> getMyOrderDetails() {
         String userName = JwtRequestFilter.CURRENT_USER;
-        return  orderRepository.findByUser_UserName(userName);
+        return  orderRepository.findByUser_Email(userName);
     }
 
     private OrderDetails createOrderDetails(OrderDto orderDto, Products product, User user,

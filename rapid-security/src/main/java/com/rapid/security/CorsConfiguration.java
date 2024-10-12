@@ -32,6 +32,7 @@ public class CorsConfiguration {
                 registry.addMapping("/**")
                         .allowedMethods(Constant.GET, Constant.POST,
                                 Constant.PUT, Constant.DELETE)
+                        .allowedOrigins("http://127.0.0.1:5500")
                         .allowedHeaders("*")
                         .allowedOriginPatterns("*")
                         .allowCredentials(true);

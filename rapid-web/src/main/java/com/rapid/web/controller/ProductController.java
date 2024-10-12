@@ -1,6 +1,7 @@
 package com.rapid.web.controller;
 
 
+import com.rapid.core.dto.ProductDetailResponse;
 import com.rapid.core.entity.product.Products;
 import com.rapid.service.ProductService;
 import org.apache.commons.lang3.StringUtils;
@@ -26,11 +27,27 @@ public class ProductController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/details/categories")
+    public ResponseEntity<?> getCategoriesProducts(@RequestParam(defaultValue = "0") Integer pageNumber,
+                                            @RequestParam(defaultValue = StringUtils.EMPTY) String searchKey){
+        Page<Products> products = productService.getCategoriesProducts(pageNumber,searchKey);
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/getProductDetails/{isSingleProductCheckOut}/{productId}")
     public ResponseEntity<?> getProductDetails(@PathVariable(name = "isSingleProductCheckOut")
               boolean isSingleProductCheckOut,
              @PathVariable(name = "productId") Integer productId){
         List<Products> products = productService.getProductDetails(isSingleProductCheckOut,productId);
+        return new ResponseEntity<>(products,HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/productDetails/{isSingleProductCheckOut}/{productId}")
+    public ResponseEntity<?> getProductDetail(@PathVariable(name = "isSingleProductCheckOut")
+                                               boolean isSingleProductCheckOut,
+                                               @PathVariable(name = "productId") Integer productId){
+        List<ProductDetailResponse> products = productService.getProductDetail(isSingleProductCheckOut,productId);
         return new ResponseEntity<>(products,HttpStatus.OK);
     }
 }

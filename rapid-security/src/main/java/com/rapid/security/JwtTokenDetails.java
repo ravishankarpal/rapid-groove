@@ -61,7 +61,7 @@ public class JwtTokenDetails {
         return Jwts.builder().setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+ TOKEN_VALIDITY * 100))
+                .setExpiration(new Date(System.currentTimeMillis()+ TOKEN_VALIDITY * 1000))
                 .signWith(SignatureAlgorithm.HS512,SECRET_KEY)
                 .compact();
 

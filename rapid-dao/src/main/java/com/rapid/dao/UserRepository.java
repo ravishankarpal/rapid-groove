@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public interface UserRepository  extends JpaRepository<User, String> {
 
     @Query(value = "select ur.role_id from user u join user_role ur\n" +
-            "on u.user_name = ur.user_id\n" +
-            "where u.user_name =:userName",nativeQuery = true)
+            "on u.email = ur.user_id\n" +
+            "where u.email =:userName",nativeQuery = true)
     String getUserRole(@RequestParam("userName") String userName);
 }

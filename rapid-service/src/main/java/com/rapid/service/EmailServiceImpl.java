@@ -5,11 +5,12 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -20,30 +21,18 @@ public class EmailServiceImpl implements  EmailService{
 
     @Value("${spring.mail.username}")
     String from;
+
+    @Autowired
+    private PdfService pdfService;
     @Override
-    public void sendOrderConfirmationEmail(List<OrderDetails> orderDetails) throws MessagingException {
+    public void sendOrderConfirmationEmail(List<OrderDetails> orderDetails) throws MessagingException, IOException {
         OrderDetails orderDetail = orderDetails.get(0);
         String to = orderDetail.getOrderEmail();
         String subject = "Order Confirmation";
         String body = buildOrderConfirmationEmailBody(orderDetails);
-        sendOrderConfirmationEmail(to, subject, body);
+        sendOrderConfirmationEmailHelper(to, subject, body,orderDetails);
 
     }
-
-    public void sendOrderConfirmationEmail(String to, String subject,String  body) throws MessagingException {
-        SimpleMailMessage message = new SimpleMailMessage();
-        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-        helper.setFrom(from);
-        helper.setTo(to);
-        helper.setSubject(subject);
-        helper.setText(body, true);
-        javaMailSender.send(mimeMessage);
-    }
-
-
-
-
 
     private String buildOrderConfirmationEmailBody(List<OrderDetails> orderDetails) {
         StringBuilder body = new StringBuilder("<html><body><p>Thank you for placing your order! Your order details are:</p>");
@@ -78,5 +67,23 @@ public class EmailServiceImpl implements  EmailService{
                 .mapToDouble(OrderDetails::getTotalPrice)
                 .sum();
 
+    }
+
+    public void sendOrderConfirmationEmailHelper(String to, String subject, String body,
+                                                 List<OrderDetails> orderDetails) throws MessagingException, IOException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        String fileName = "invoice_"+ orderDetails.get(0).getOrderId();
+        helper.setFrom(from);
+        helper.setTo(to);
+        helper.setSubject(subject);
+        helper.setReplyTo("noreply@example.com");
+        helper.setText(body, true);
+        byte[] pdfAttachment = pdfService.generateInvoice(orderDetails);
+        // Attach the PDF file
+        helper.addAttachment(fileName, new ByteArrayResource(pdfAttachment),
+                "application/pdf");
+
+        javaMailSender.send(mimeMessage);
     }
 }
