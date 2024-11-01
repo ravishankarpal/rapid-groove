@@ -3,6 +3,7 @@ package com.rapid.web.controller;
 
 import com.rapid.core.dto.AddToCartRequestDTO;
 import com.rapid.core.dto.CartItemResponseDTO;
+import com.rapid.core.dto.CheckoutRequestDTO;
 import com.rapid.core.entity.order.CartItem;
 import com.rapid.service.CartService;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
@@ -59,6 +60,12 @@ public class CartController {
             cartService.addItemToCart(cartRequestDTO);
             return new ResponseEntity<>(HttpStatus.OK);
 
+    }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<?> checkout(@RequestBody CheckoutRequestDTO checkout) throws RapidGrooveException{
+        cartService.updateCheckOut(checkout);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
