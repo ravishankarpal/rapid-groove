@@ -13,18 +13,15 @@ import java.util.Set;
 public class User {
 
     @Id
-    @Column(name = "user_name")
-    private String userName;
+    @Column(name = "email")
+    private String email;
 
-    @Column(name = "user_first_name")
-    private String userFirstName;
-
-    @Column(name = "user_last_name")
-    private String userLastName;
+    @Column(name = "name")
+    private String name;
 
 
-    @Column(name = "user_password")
-    private String userPassword;
+    @Column(name = "password")
+    private String password;
 
 //    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 //    private Cart cart;

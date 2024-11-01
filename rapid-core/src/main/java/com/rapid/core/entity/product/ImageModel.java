@@ -1,7 +1,9 @@
 package com.rapid.core.entity.product;
 
 
+import com.rapid.core.dto.ProductDetailDTO;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +14,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "image_model")
 
-
+@AllArgsConstructor
 public class ImageModel {
 
     @Id
@@ -33,5 +35,9 @@ public class ImageModel {
         this.name = name;
         this.type = type;
         this.picByte = picByte;
+    }
+
+    public ImageModel(ProductDetailDTO productDetailDTO){
+
     }
 }
