@@ -1,20 +1,18 @@
 package com.rapid.web.controller;
 import com.rapid.core.dto.LoginDto;
 import com.rapid.core.dto.UserAddressDTO;
+import com.rapid.core.dto.UserResponse;
 import com.rapid.core.entity.DeliveryAvailability;
-import com.rapid.core.entity.Role;
 import com.rapid.core.entity.User;
 import com.rapid.service.UserService;
 import com.rapid.service.exception.RapidGrooveException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashSet;
-import java.util.Set;
 
 
 @RestController
@@ -23,10 +21,18 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    @PostMapping("/register_user")
-    public ResponseEntity<?> registerUser(@RequestBody User user){
-        userService.registerUser(user);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+    @PostMapping("/signup")
+    public ResponseEntity<?> registerUser(@RequestBody User user) throws RapidGrooveException {
+           UserResponse userResponse = userService.registerUser(user);
+           return new ResponseEntity<>(userResponse,HttpStatus.OK);
+
+    }
+
+
+    @PostMapping("/update/password/")
+    public ResponseEntity<?> updatePassword(@RequestParam String userName, @RequestParam String password) throws RapidGrooveException, MessagingException {
+        userService.updatePassword(userName, password);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

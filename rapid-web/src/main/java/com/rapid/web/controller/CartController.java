@@ -3,7 +3,6 @@ package com.rapid.web.controller;
 
 import com.rapid.core.dto.AddToCartRequestDTO;
 import com.rapid.core.dto.CartItemResponseDTO;
-import com.rapid.core.dto.CheckoutRequestDTO;
 import com.rapid.core.entity.order.CartItem;
 import com.rapid.service.CartService;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
@@ -11,7 +10,6 @@ import com.rapid.service.exception.RapidGrooveException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,10 +60,5 @@ public class CartController {
 
     }
 
-    @PostMapping("/checkout")
-    public ResponseEntity<?> checkout(@RequestBody CheckoutRequestDTO checkout) throws RapidGrooveException{
-        cartService.updateCheckOut(checkout);
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
 
 }

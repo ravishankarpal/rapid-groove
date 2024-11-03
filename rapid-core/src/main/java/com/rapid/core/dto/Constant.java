@@ -13,4 +13,12 @@ public class Constant {
 
     public static final String DELIVERY_FEE_THRESHOLD  = "delivery_fee_threshold";
 
+    public static final String FORGOT_PASSWORD = "Forgot Password";
+    public static final int OTP_LENGTH = 6;
+
+    public static final int OTP_VALIDITY_MINUTES = 2;
+
+
+
+
 }

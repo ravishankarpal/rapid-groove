@@ -1,5 +1,7 @@
 package com.rapid.service;
 
+import com.rapid.core.dto.Constant;
+import com.rapid.core.entity.User;
 import com.rapid.core.entity.order.OrderDetails;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -31,6 +33,31 @@ public class EmailServiceImpl implements  EmailService{
         String subject = "Order Confirmation";
         String body = buildOrderConfirmationEmailBody(orderDetails);
         sendOrderConfirmationEmailHelper(to, subject, body,orderDetails);
+
+    }
+
+    @Override
+    public void sendOTPEmail(User user, String otp) throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+        helper.setFrom(from);
+        helper.setTo(user.getEmail());
+        helper.setSubject("[Rapid Groove] Please reset your password");
+        helper.setReplyTo("noreply@example.com");
+        String emailContent = "<html><body>" +
+                "<h2>Rapid Groove Password Reset</h2>" +
+                "<p>Hi "+user.getName()+",</p>" +
+                "<p>We received a request to reset the password for your Rapid Groove account.</p>" +
+                "<p>Your OTP (One-Time Password) for resetting your password is:</p>" +
+                "<h3 style=\"color: #2d87f0;\">" + otp + "</h3>" +
+                "<p>Please use this OTP within <strong>" + Constant.OTP_VALIDITY_MINUTES + " minutes</strong> as it will expire after that.</p>" +
+                "<p>If you did not request a password reset, please ignore this email or contact our support team.</p>" +
+                "<br>" +
+                "<p>Thank you,</p>" +
+                "<p>The Rapid Groove Team</p>" +
+                "</body></html>";
+        helper.setText(emailContent, true);
+        javaMailSender.send(mimeMessage);
 
     }
 

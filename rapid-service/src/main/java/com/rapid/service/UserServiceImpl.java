@@ -1,35 +1,28 @@
 package com.rapid.service;
 
+import com.rapid.core.dto.Constant;
 import com.rapid.core.dto.LoginDto;
 import com.rapid.core.dto.UserAddressDTO;
-import com.rapid.core.entity.DeliveryAvailability;
-import com.rapid.core.entity.Role;
-import com.rapid.core.entity.User;
-import com.rapid.core.entity.UserAddress;
+import com.rapid.core.dto.UserResponse;
+import com.rapid.core.entity.*;
 import com.rapid.core.exception.InvalidCredentialsException;
-import com.rapid.dao.DeliveryAvailabilityRepository;
-import com.rapid.dao.RoleRepository;
-import com.rapid.dao.UserAddressRepository;
-import com.rapid.dao.UserRepository;
+import com.rapid.dao.*;
 import com.rapid.security.JwtRequestFilter;
 import com.rapid.security.service.JwtService;
 import com.rapid.service.exception.RapidGrooveException;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -55,23 +48,47 @@ public class UserServiceImpl implements  UserService{
     @Autowired
     private UserAddressRepository userAddressRepository;
 
+    @Autowired
+    private OtpResetTokenRepository otpResetTokenRepository;
+
+    @Autowired
+    private EmailService emailService;
+
 
     @Override
-    public void registerUser(User user) {
-        User us = new User();
-        Role defaultRole = roleRepository.findByRoleName("User");
-        Set<Role> roles = new HashSet<>();
-        if (user.getRole() == null || user.getRole().isEmpty()) {
-            roles.add(defaultRole);
-            user.setRole(roles);
-        }else{
-            roles = user.getRole();
+    public UserResponse registerUser(User user) {
+        UserResponse userResponse = new UserResponse();
+        try {
+            Optional<User> existingUser = userRepository.findById(user.getEmail());
+
+            if (existingUser.isPresent()) {
+                userResponse.setCode(HttpStatus.BAD_REQUEST);
+                userResponse.setMessage("User already exist!");
+                return  userResponse;
+            }
+            User us = new User();
+            Role defaultRole = roleRepository.findByRoleName("User");
+            Set<Role> roles = new HashSet<>();
+            if (user.getRole() == null || user.getRole().isEmpty()) {
+                roles.add(defaultRole);
+                user.setRole(roles);
+            } else {
+                roles = user.getRole();
+            }
+            us.setName(user.getName());
+            us.setEmail(user.getEmail());
+            us.setRole(roles);
+            us.setPassword(passwordEncoder.encode(user.getPassword()));
+            userRepository.saveAndFlush(us);
+            userResponse.setCode(HttpStatus.OK);
+            userResponse.setMessage("User registered successfully!");
         }
-        us.setName(user.getName());
-        us.setEmail(user.getEmail());
-        us.setRole(roles);
-        us.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.saveAndFlush(us);
+        catch (Exception e){
+            log.error("Exception occurred while sign up the user {}",user.getEmail() , e);
+            userResponse.setCode(HttpStatus.BAD_REQUEST);
+            userResponse.setMessage("User registered failed");
+        }
+        return userResponse;
 
     }
 
@@ -144,6 +161,14 @@ public class UserServiceImpl implements  UserService{
         }else{
             log.info("User details can not be blank");
         }
+
+    }
+
+    @Override
+    public void updatePassword(String otp, String password) {
+
+
+
 
     }
 

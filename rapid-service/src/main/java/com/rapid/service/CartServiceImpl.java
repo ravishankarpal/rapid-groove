@@ -4,7 +4,6 @@ package com.rapid.service;
 import com.rapid.core.dto.AddToCartRequestDTO;
 import com.rapid.core.dto.CartItemResponseDTO;
 import com.rapid.core.dto.CartProduct;
-import com.rapid.core.dto.CheckoutRequestDTO;
 import com.rapid.core.entity.User;
 import com.rapid.core.entity.order.Cart;
 import com.rapid.core.entity.order.CartItem;
@@ -15,14 +14,12 @@ import com.rapid.security.JwtRequestFilter;
 import com.rapid.security.JwtTokenDetails;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
 import com.rapid.service.exception.RapidGrooveException;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Service
@@ -298,43 +295,6 @@ public class CartServiceImpl implements CartService{
         return cartItemResponseDTOS;
     }
 
-
-    @Override
-    public void updateCheckOut(CheckoutRequestDTO checkout) throws RapidGrooveException {
-        String userName = JwtRequestFilter.CURRENT_USER;
-
-        List<Integer> selectedProductIds = checkout.getSelectedProductIds();
-        User user = userRepository.findById(userName).orElseThrow(() -> new RapidGrooveException("User Not Found"));
-
-        List<CartItem> cartItems = cartItemRepository.getCartDetails(userName);
-
-        if (!CollectionUtils.isEmpty(cartItems)) {
-            // Loop through each cart item
-            for (CartItem cartItem : cartItems) {
-                CartItemResponseDTO cartItemResponseDTO = new CartItemResponseDTO(); // Create a new response DTO for each item
-
-                // Set the cart item ID
-                cartItemResponseDTO.setId(cartItem.getId());
-
-                // Handle product details
-                List<CartProduct> cartProducts = new ArrayList<>();
-                CartProduct cartProduct = new CartProduct(cartItem.getProducts()); // Wrap the product in CartProduct
-                cartProducts.add(cartProduct); // Add to the list
-                cartItemResponseDTO.setProduct(cartProducts); // Set products to DTO
-
-                // Handle size price details
-                List<ProductSizePrice> productSizePrices = new ArrayList<>();
-                ProductSizePrice productSizePrice = cartItem.getProductSizePrice(); // Get product size price from CartItem
-                productSizePrices.add(productSizePrice); // Add to the list
-                cartItemResponseDTO.setProductSizePrice(productSizePrices); // Set size prices to DTO
-
-                // Add the individual CartItemResponseDTO to the main list
-                //cartItemResponseDTOS.add(cartItemResponseDTO);
-            }
-        }
-
-
-    }
 
 
 
