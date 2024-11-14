@@ -1,5 +1,6 @@
 package com.rapid.service;
 
+import com.rapid.core.dto.ComplainDTO;
 import com.rapid.core.dto.LoginDto;
 import com.rapid.core.dto.UserAddressDTO;
 import com.rapid.core.dto.UserResponse;
@@ -25,4 +26,5 @@ public interface UserService {
     void updatePassword(String otp, String password);
 
 
+    void registerComplain(ComplainDTO complainDTO);
 }

@@ -1,4 +1,5 @@
 package com.rapid.web.controller;
+import com.rapid.core.dto.ComplainDTO;
 import com.rapid.core.dto.LoginDto;
 import com.rapid.core.dto.UserAddressDTO;
 import com.rapid.core.dto.UserResponse;
@@ -29,7 +30,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/update/password/")
+    @PostMapping("/update-password")
     public ResponseEntity<?> updatePassword(@RequestParam String userName, @RequestParam String password) throws RapidGrooveException, MessagingException {
         userService.updatePassword(userName, password);
         return new ResponseEntity<>(HttpStatus.OK);
@@ -74,6 +75,12 @@ public class UserController {
         userService.saveUserAddressDetails(userAddressDTO);
      return  new ResponseEntity<>(HttpStatus.OK);
 
+    }
+
+    @PostMapping(value = "/register/complain")
+    public ResponseEntity<?> registerComplain(@RequestBody ComplainDTO complainDTO){
+        userService.registerComplain(complainDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

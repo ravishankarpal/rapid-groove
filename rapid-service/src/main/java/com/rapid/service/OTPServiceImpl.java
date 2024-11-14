@@ -77,11 +77,13 @@ public class OTPServiceImpl implements OTPService{
             }
             else if (otpResetToken == null || otpResetToken.getOtp() == null ||
             BooleanUtils.toBoolean(otpResetToken.getIsUsed())) {
-                return "Invalid OTP!";
+                return "Invalid code. Please try again.";
             }
 
             else if (!otp.equals(otpResetToken.getOtp())) {
-                return "Invalid OTP!";
+                return "Invalid code. Please try again.";
+            } else if (isOtpExpired(otpResetToken)) {
+                return "Your code has expired. Please request a new one.";
             }
 
             invalidateOtpToken(userName,otp);

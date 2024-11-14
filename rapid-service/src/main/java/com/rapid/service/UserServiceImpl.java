@@ -1,9 +1,6 @@
 package com.rapid.service;
 
-import com.rapid.core.dto.Constant;
-import com.rapid.core.dto.LoginDto;
-import com.rapid.core.dto.UserAddressDTO;
-import com.rapid.core.dto.UserResponse;
+import com.rapid.core.dto.*;
 import com.rapid.core.entity.*;
 import com.rapid.core.exception.InvalidCredentialsException;
 import com.rapid.dao.*;
@@ -18,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +48,9 @@ public class UserServiceImpl implements  UserService{
 
     @Autowired
     private OtpResetTokenRepository otpResetTokenRepository;
+
+    @Autowired
+    private UserComplainRepository userComplainRepository;
 
     @Autowired
     private EmailService emailService;
@@ -165,9 +166,41 @@ public class UserServiceImpl implements  UserService{
     }
 
     @Override
-    public void updatePassword(String otp, String password) {
+    public void updatePassword(String userName, String password) {
+        log.info("Updating the password for user {}",userName);
+        User user = userRepository.findById(userName).orElse(null);
+        if(user == null){
+            log.error("User {} not found. Password update failed.", userName);
+            throw new UsernameNotFoundException("User not found: " + userName);
 
+        }
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.saveAndFlush(user);
 
+    }
+
+    @Override
+    public void registerComplain(ComplainDTO complainDTO) {
+        if(complainDTO == null || complainDTO.getUserId() == null){
+            log.info("User can not be null to register complain");
+            return;
+        }
+        try {
+            log.info("Going to register a complain for user {}", complainDTO.getUserId());
+            UserComplain userComplain = new UserComplain();
+            User user = userRepository.findById(complainDTO.getUserId()).orElseThrow(()->new RuntimeException("User not found"));
+            userComplain.setUser(user);
+            userComplain.setOrderNumber(complainDTO.getOrderNumber());
+            userComplain.setDepartment(complainDTO.getDepartment());
+            userComplain.setSubject(complainDTO.getSubject());
+            userComplain.setMessage(complainDTO.getMessage());
+            FileAttachment fileAttachment = new FileAttachment(complainDTO.getAttachment());
+            userComplain.setFileAttachment(fileAttachment);
+            userComplainRepository.saveAndFlush(userComplain);
+        }catch (Exception e){
+            log.error("Exception occuured while registering complain for user {}", complainDTO.getUserId());
+
+        }
 
 
     }
