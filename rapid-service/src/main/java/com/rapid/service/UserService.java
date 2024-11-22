@@ -26,5 +26,5 @@ public interface UserService {
     void updatePassword(String otp, String password);
 
 
-    void registerComplain(ComplainDTO complainDTO);
+    void registerComplain(ComplainDTO complainDTO) throws RapidGrooveException ;
 }

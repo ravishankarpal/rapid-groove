@@ -78,9 +78,14 @@ public class UserController {
     }
 
     @PostMapping(value = "/register/complain")
-    public ResponseEntity<?> registerComplain(@RequestBody ComplainDTO complainDTO){
-        userService.registerComplain(complainDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<?> registerComplain(@RequestBody ComplainDTO complainDTO) throws RapidGrooveException {
+        try {
+            userService.registerComplain(complainDTO);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (RapidGrooveException e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
 

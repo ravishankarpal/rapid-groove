@@ -1,12 +1,12 @@
 package com.rapid.web.controller;
 
 
-import com.rapid.core.dto.AddToCartRequestDTO;
-import com.rapid.core.dto.CartItemResponseDTO;
+import com.rapid.core.dto.*;
 import com.rapid.core.entity.order.CartItem;
 import com.rapid.service.CartService;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
 import com.rapid.service.exception.RapidGrooveException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +59,29 @@ public class CartController {
             return new ResponseEntity<>(HttpStatus.OK);
 
     }
+
+    @PutMapping(value = "/update-quantity")
+    public ResponseEntity<?> updateCartQuantity(@RequestBody UpdateCartDTO updateCartDTO) throws Exception {
+        cartService.updateCartQuantity(updateCartDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @PostMapping("/checkout")
+    public ResponseEntity<?> processCheckout(@Valid @RequestBody CheckoutRequestDTO checkoutRequest) throws RapidGrooveException {
+         cartService.processCheckout(checkoutRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @GetMapping("/checkoutdetails")
+    public ResponseEntity<?> getCheckoutDetails() throws RapidGrooveException {
+       CheckoutResponse checkoutResponse =  cartService.getCheckoutDetails();
+        return new ResponseEntity<>(checkoutResponse,HttpStatus.OK);
+    }
+
+
+
 
 
 }

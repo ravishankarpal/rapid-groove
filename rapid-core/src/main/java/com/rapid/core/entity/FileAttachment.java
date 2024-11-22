@@ -23,7 +23,7 @@ public class FileAttachment {
     private String fileType;
 
     @Lob
-    @Column(name = "file_data", nullable = false)
+    @Column(name = "file_data", nullable = false,length = 50000000)
     private byte[] fileData;
 
     public FileAttachment(AttachmentDTO attachmentDTO){

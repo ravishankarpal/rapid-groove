@@ -180,7 +180,7 @@ public class UserServiceImpl implements  UserService{
     }
 
     @Override
-    public void registerComplain(ComplainDTO complainDTO) {
+    public void registerComplain(ComplainDTO complainDTO) throws RapidGrooveException {
         if(complainDTO == null || complainDTO.getUserId() == null){
             log.info("User can not be null to register complain");
             return;
@@ -198,7 +198,7 @@ public class UserServiceImpl implements  UserService{
             userComplain.setFileAttachment(fileAttachment);
             userComplainRepository.saveAndFlush(userComplain);
         }catch (Exception e){
-            log.error("Exception occuured while registering complain for user {}", complainDTO.getUserId());
+            throw new RapidGrooveException("Something went wrong ! Please try again");
 
         }
 

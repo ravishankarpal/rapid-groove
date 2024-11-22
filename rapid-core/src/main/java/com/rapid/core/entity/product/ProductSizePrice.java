@@ -47,6 +47,8 @@ public class ProductSizePrice implements Serializable {
 //    @Column(name = "delivery_fee")
 //    private Integer deliveryFee;
 
+    @Transient
+    private Integer qty;
 
 
 

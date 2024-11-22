@@ -1,9 +1,9 @@
 package com.rapid.service;
 
 
-import com.rapid.core.dto.AddToCartRequestDTO;
-import com.rapid.core.dto.CartItemResponseDTO;
-import com.rapid.core.dto.CartProduct;
+import com.rapid.core.dto.*;
+import com.rapid.core.entity.CheckoutItem;
+import com.rapid.core.entity.CheckoutRequest;
 import com.rapid.core.entity.User;
 import com.rapid.core.entity.order.Cart;
 import com.rapid.core.entity.order.CartItem;
@@ -14,11 +14,14 @@ import com.rapid.security.JwtRequestFilter;
 import com.rapid.security.JwtTokenDetails;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
 import com.rapid.service.exception.RapidGrooveException;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 
 
@@ -43,6 +46,9 @@ public class CartServiceImpl implements CartService{
 
     @Autowired
     private ProductSizePriceRepository productSizePriceRepository;
+
+    @Autowired
+    private CheckoutRequestRepository checkoutRequestRepository;
     @Override
         public void addToCart(Integer productId) {
             log.info("going to add product in cart for productId :{}",productId);
@@ -137,7 +143,6 @@ public class CartServiceImpl implements CartService{
         log.info("Item added in cart successfully for user {}", userName);
 
     }
-
 
 
 
@@ -279,6 +284,7 @@ public class CartServiceImpl implements CartService{
                     cartItemResponseDTO.getProduct().add(cartProduct);
                     ProductSizePrice productSizePrice = cartItem.getProductSizePrice();
                     if (productSizePrice != null) {
+                        productSizePrice.setQty(cartItem.getQuantity());
                         cartItemResponseDTO.getProductSizePrice().add(productSizePrice);
                     }
 
@@ -296,6 +302,87 @@ public class CartServiceImpl implements CartService{
     }
 
 
+    @Override
+    public void updateCartQuantity(UpdateCartDTO updateCartDTO) throws Exception {
+
+        String user = JwtRequestFilter.CURRENT_USER;
+        if (updateCartDTO.getCartItemId() == null){
+            throw new Exception("Cart Item Id can't be blank");
+        }
+        CartItem cartItem = cartItemRepository.findCartDetailsByUserAndCartId(user,updateCartDTO.getCartItemId());
+        cartItem.setQuantity(updateCartDTO.getQuantity());
+        cartItemRepository.saveAndFlush(cartItem);
+
+    }
+
+    @Override
+    public void processCheckout(CheckoutRequestDTO checkoutRequest) throws RapidGrooveException {
+
+        String userName = JwtRequestFilter.CURRENT_USER;
+        User user = userRepository.findById(userName).orElseThrow(()-> new RapidGrooveException("User not found"));
+        log.info("Start updating checkout details for user {}:", user.getEmail());
+        checkoutRequestRepository.deleteCheckoutItemsByUserId(user.getEmail());
+        checkoutRequestRepository.deleteCheckoutRequestsByUserId(user.getEmail());
+        CheckoutRequest checkout = new CheckoutRequest();
+        List<CheckoutItem> checkoutItems = new ArrayList<>();
+        for(CheckoutItemDTO checkoutItemDTO :checkoutRequest.getCheckoutItems()){
+            CheckoutItem checkoutItem = new CheckoutItem(checkoutItemDTO);
+            checkoutItems.add(checkoutItem);
+        }
+        checkout.setCheckoutItems(checkoutItems);
+        checkout.setUser(user);
+        checkout.setTotalAmount(checkoutRequest.getTotalAmount());
+        checkout.setDiscountAmount(checkoutRequest.getDiscountAmount());
+        checkoutRequestRepository.saveAndFlush(checkout);
+        log.info("Successfully checkout by for user {}:", user.getEmail());
+
+
+
+    }
+
+    @Override
+    public CheckoutResponse getCheckoutDetails() throws RapidGrooveException {
+        String currentUser = JwtRequestFilter.CURRENT_USER;
+        User user = userRepository.findById(currentUser).orElseThrow(()-> new RapidGrooveException("User not found!"));
+        Object[] objects =  checkoutRequestRepository.findByUserId(user.getEmail());
+        CheckoutResponse checkoutResponse = new CheckoutResponse();
+        if(objects == null ||objects.length==0 ) {
+            log.info("No details found");
+        }
+        Object obj = objects[0];
+
+        if (obj instanceof Object[]) {
+            Object[] row = (Object[]) obj; // Cast the first row to Object[]
+
+            // Set values in CheckoutResponse
+            checkoutResponse.setProductId((Integer) row[0]);          // product_id
+            checkoutResponse.setProductName((String) row[1]);         // product_name
+            checkoutResponse.setQuantity((Integer) row[2]);           // quantity
+            checkoutResponse.setSize((String) row[3]);                // size
+            checkoutResponse.setPrice((BigDecimal) row[4]);           // price
+            checkoutResponse.setPicByte((byte[]) row[5]);             // pic_byte
+            checkoutResponse.setTotalAmount((BigDecimal) row[6]);     // total_amount
+            checkoutResponse.setDiscountAmount((Double) row[7]);  // discount_amount
+        } else {
+            log.error("Unexpected data structure: " + obj.getClass());
+        }
+
+
+//        checkoutResponse.setProductId();
+//            checkoutResponse.setProductName(((String) obj[1]).toString());
+//            checkoutResponse.setQuantity(((BigInteger) obj[2]).intValue());
+//            checkoutResponse.setSize(((String) obj[3]).toString());
+//            checkoutResponse.setPrice(((BigDecimal) obj[4]));
+//            //checkoutResponse.setPicByte();
+//            checkoutResponse.setTotalAmount(((BigDecimal) obj[6]));
+//            checkoutResponse.setTotalAmount(((BigDecimal) obj[7]));
+
+
+
+
+        return checkoutResponse;
+
+    }
 
 
 }
