@@ -30,4 +30,7 @@ public class CheckoutRequest {
     private BigDecimal totalAmount;
     @Column(name = "discount_Amount")
     private Double discountAmount;
+
+    @Column(name = "delivery_fee")
+    private String deliveryFee;
 }

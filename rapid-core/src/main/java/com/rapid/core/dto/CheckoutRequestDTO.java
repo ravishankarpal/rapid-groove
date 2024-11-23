@@ -20,4 +20,5 @@ public class CheckoutRequestDTO {
     @NotNull(message = "Total amount should not be blank")
     private BigDecimal totalAmount;
     private Double discountAmount;
+    private String deliveryFee;
 }

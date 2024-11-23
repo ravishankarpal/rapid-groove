@@ -5,18 +5,15 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
 public class CheckoutResponse {
 
-    private Integer productId;
-    private String productName;
-    private Integer quantity;
-    private String size;
-    private BigDecimal price;
-    private byte[] picByte;
+    private List<CheckoutItemResponse> checkoutItemResponses;
     private BigDecimal totalAmount;
     private Double discountAmount;
+    private String deliveryFee;
 
 }

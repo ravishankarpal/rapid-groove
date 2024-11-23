@@ -333,6 +333,7 @@ public class CartServiceImpl implements CartService{
         checkout.setUser(user);
         checkout.setTotalAmount(checkoutRequest.getTotalAmount());
         checkout.setDiscountAmount(checkoutRequest.getDiscountAmount());
+        checkout.setDeliveryFee(checkoutRequest.getDeliveryFee());
         checkoutRequestRepository.saveAndFlush(checkout);
         log.info("Successfully checkout by for user {}:", user.getEmail());
 
@@ -345,40 +346,43 @@ public class CartServiceImpl implements CartService{
         String currentUser = JwtRequestFilter.CURRENT_USER;
         User user = userRepository.findById(currentUser).orElseThrow(()-> new RapidGrooveException("User not found!"));
         Object[] objects =  checkoutRequestRepository.findByUserId(user.getEmail());
-        CheckoutResponse checkoutResponse = new CheckoutResponse();
+        CheckoutResponse  checkoutResponse = new CheckoutResponse();
         if(objects == null ||objects.length==0 ) {
             log.info("No details found");
         }
-        Object obj = objects[0];
+        List<CheckoutItemResponse> checkoutItemResponses = new ArrayList<>();
+        boolean isTotalAmountAdded = false;
+        boolean isDiscountAmountAdded = false;
+        boolean isDeliverFeeIncluded = false;
+        for (Object obj : objects) {
+            if (obj instanceof Object[]) {
+                Object[] row = (Object[]) obj;
+                CheckoutItemResponse checkoutItemResponse = new CheckoutItemResponse(); // Create a new CheckoutResponse instance
+                checkoutItemResponse.setProductId((Integer) row[0]);          // product_id
+                checkoutItemResponse.setProductName((String) row[1]);         // product_name
+                checkoutItemResponse.setQuantity((Integer) row[2]);           // quantity
+                checkoutItemResponse.setSize((String) row[3]);                // size
+                checkoutItemResponse.setPrice((BigDecimal) row[4]);           // price
+                checkoutItemResponse.setPicByte((byte[]) row[5]);             // pic_byte
+                checkoutItemResponses.add(checkoutItemResponse);
+                if (!isTotalAmountAdded){
+                    checkoutResponse.setTotalAmount((BigDecimal) row[6]);
+                    isTotalAmountAdded = true;
+                }
 
-        if (obj instanceof Object[]) {
-            Object[] row = (Object[]) obj; // Cast the first row to Object[]
+                if (!isDiscountAmountAdded){
+                    checkoutResponse.setDiscountAmount((Double) row[7]);
+                    isDiscountAmountAdded = true;
+                }
 
-            // Set values in CheckoutResponse
-            checkoutResponse.setProductId((Integer) row[0]);          // product_id
-            checkoutResponse.setProductName((String) row[1]);         // product_name
-            checkoutResponse.setQuantity((Integer) row[2]);           // quantity
-            checkoutResponse.setSize((String) row[3]);                // size
-            checkoutResponse.setPrice((BigDecimal) row[4]);           // price
-            checkoutResponse.setPicByte((byte[]) row[5]);             // pic_byte
-            checkoutResponse.setTotalAmount((BigDecimal) row[6]);     // total_amount
-            checkoutResponse.setDiscountAmount((Double) row[7]);  // discount_amount
-        } else {
-            log.error("Unexpected data structure: " + obj.getClass());
+                if (!isDeliverFeeIncluded){
+                    checkoutResponse.setDeliveryFee((String) row[8]);
+                    isDeliverFeeIncluded = true;
+                }
+                checkoutResponse.setCheckoutItemResponses(checkoutItemResponses);
+
+            }
         }
-
-
-//        checkoutResponse.setProductId();
-//            checkoutResponse.setProductName(((String) obj[1]).toString());
-//            checkoutResponse.setQuantity(((BigInteger) obj[2]).intValue());
-//            checkoutResponse.setSize(((String) obj[3]).toString());
-//            checkoutResponse.setPrice(((BigDecimal) obj[4]));
-//            //checkoutResponse.setPicByte();
-//            checkoutResponse.setTotalAmount(((BigDecimal) obj[6]));
-//            checkoutResponse.setTotalAmount(((BigDecimal) obj[7]));
-
-
-
 
         return checkoutResponse;
 

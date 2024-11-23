@@ -34,7 +34,7 @@ public interface CheckoutRequestRepository  extends JpaRepository<CheckoutReques
             nativeQuery = true)
     void deleteCheckoutRequestsByUserId(@Param("userId") String userId);
 
-    @Query(value = "select ci.product_id,ci.product_name,ci.quantity, ci.size,ci.price,ci.pic_byte , cr.total_amount,discount_amount from " +
+    @Query(value = "select ci.product_id,ci.product_name,ci.quantity, ci.size,ci.price,ci.pic_byte , cr.total_amount,cr.discount_amount,cr.delivery_fee from " +
             " checkout_requests cr join checkout_items ci on cr.id = ci.checkout_request_id" +
             " where cr.user_id =:userId",nativeQuery = true)
     Object[] findByUserId(@Param("userId") String userId);
