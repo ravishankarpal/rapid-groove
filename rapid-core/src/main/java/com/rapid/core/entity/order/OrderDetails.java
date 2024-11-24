@@ -51,6 +51,9 @@ public class OrderDetails {
     @JoinColumn(name = "product_id")
     private Products product;
 
+    @Column(name = "delivery_fee")
+    private Double deliveryFee;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
