@@ -2,9 +2,11 @@ package com.rapid.core.entity;
 
 import com.rapid.core.entity.order.Cart;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import java.util.Set;
+
 
 @Entity
 @Getter
@@ -22,6 +24,12 @@ public class User {
 
     @Column(name = "password")
     private String password;
+
+    @Column(name = "auth_provider")
+    private String authProvider;
+
+    @Column(name = "email_verified")
+    private boolean emailVerified;
 
 //    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
 //    private Cart cart;

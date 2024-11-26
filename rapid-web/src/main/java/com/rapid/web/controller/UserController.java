@@ -5,6 +5,7 @@ import com.rapid.core.dto.UserAddressDTO;
 import com.rapid.core.dto.UserResponse;
 import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.User;
+import com.rapid.service.CustomOAuth2UserService;
 import com.rapid.service.UserService;
 import com.rapid.service.exception.RapidGrooveException;
 import jakarta.mail.MessagingException;
@@ -12,8 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 
 @RestController
@@ -22,6 +27,10 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private CustomOAuth2UserService customOAuth2UserService;
+
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@RequestBody User user) throws RapidGrooveException {
            UserResponse userResponse = userService.registerUser(user);
@@ -86,6 +95,13 @@ public class UserController {
         catch (RapidGrooveException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @GetMapping("/0auth2")
+    public ResponseEntity<Map<String, Object>> user(@AuthenticationPrincipal OAuth2User oAuth2User){
+        Map<String, Object> userDetails = customOAuth2UserService.user(oAuth2User);
+        return new ResponseEntity<>(userDetails, HttpStatus.OK);
+
     }
 
 

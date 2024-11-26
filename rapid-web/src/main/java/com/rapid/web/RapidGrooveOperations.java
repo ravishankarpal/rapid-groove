@@ -11,6 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScans;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.web.client.RestTemplate;
 
 
 @SpringBootApplication
@@ -22,6 +23,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 
  public class RapidGrooveOperations extends SpringBootServletInitializer {
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
     public static void main(String[] args) {
         SpringApplication.run(RapidGrooveOperations.class, args);
         System.out.println("Hello World!");

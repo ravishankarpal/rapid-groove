@@ -8,6 +8,11 @@ import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.User;
 import com.rapid.service.exception.RapidGrooveException;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.OAuth2User;
+
+import java.util.Map;
 
 
 public interface UserService {
@@ -27,4 +32,5 @@ public interface UserService {
 
 
     void registerComplain(ComplainDTO complainDTO) throws RapidGrooveException ;
+
 }
