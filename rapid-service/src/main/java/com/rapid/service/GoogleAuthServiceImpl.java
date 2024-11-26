@@ -29,19 +29,6 @@ public class GoogleAuthServiceImpl implements GoogleAuthService{
     private static final String GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
     private static final String GOOGLE_USER_INFO_URL = "https://www.googleapis.com/oauth2/v3/userinfo";
 
-    @Value("${spring.security.oauth2.client.registration.google.client-id}")
-    private String clientId;
-
-//    @Value("${spring.security.oauth2.client.registration.google.redirect-uri}")
-//    private String redirectUri;
-
-//    @Value("${spring.security.oauth2.client.provider.google.authorization-uri}")
-//    private String authorizationUri;
-
-
-    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
-    private String clientSecretId;
-
     @Autowired
     private UserRepository userRepository;
 
@@ -55,7 +42,7 @@ public class GoogleAuthServiceImpl implements GoogleAuthService{
     @Override
     public Map<String, String> initiateGoogleSignIn() {
         String authUrl = UriComponentsBuilder.fromHttpUrl(GOOGLE_AUTH_URL)
-                .queryParam("client_id", clientId)
+
                // .queryParam("redirect_uri", redirectUri)
                 .queryParam("response_type", "code")
                 .queryParam("scope", "email profile")
@@ -77,8 +64,6 @@ public class GoogleAuthServiceImpl implements GoogleAuthService{
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
-        body.add("client_id", clientId);
-        body.add("client_secret", clientSecretId);
         body.add("code", code);
        // body.add("redirect_uri", redirectUri);
         body.add("grant_type", "authorization_code");
