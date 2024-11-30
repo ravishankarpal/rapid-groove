@@ -50,9 +50,14 @@ public class WebSecurityChainFilterConfiguration  {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/authenticate","rapid/user/**",
                             "/admin/product/**","/product/**","admin/**","rapid/cart/**",
-                            "/rapid/otp/**").permitAll();
+                            "/rapid/otp/**","/rapid/oauath2/**").permitAll();
                 })
                 .httpBasic(Customizer.withDefaults());
+//                .oauth2Login(oauth2->oauth2.loginPage("/login")
+//                        .defaultSuccessUrl("/dashboard", true)
+//                        .failureUrl("/login?error=true"));
+                //.oauth2ResourceServer(oauthServer -> oauthServer.jwt(Customizer.withDefaults()));
+
         return http.build();
     }
 
