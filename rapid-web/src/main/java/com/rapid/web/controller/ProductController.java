@@ -2,6 +2,7 @@ package com.rapid.web.controller;
 
 
 import com.rapid.core.dto.ProductDetailResponse;
+import com.rapid.core.entity.product.ProductDetails;
 import com.rapid.core.entity.product.Products;
 import com.rapid.service.ProductService;
 import org.apache.commons.lang3.StringUtils;
@@ -48,6 +49,45 @@ public class ProductController {
                                                boolean isSingleProductCheckOut,
                                                @PathVariable(name = "productId") Integer productId){
         List<ProductDetailResponse> products = productService.getProductDetail(isSingleProductCheckOut,productId);
+        return new ResponseEntity<>(products,HttpStatus.OK);
+    }
+
+
+
+//    @PostMapping
+//    public ResponseEntity<ProductDTO> createProduct(@Valid @RequestBody ProductDTO productDTO) {
+//        ProductDTO createdProduct = productDetailsService.createProduct(productDTO);
+//        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+//    }
+//
+//
+//    @GetMapping("/{id}")
+//    public ResponseEntity<ProductDTO> getProductById(@PathVariable Integer id) {
+//        ProductDTO product = productDetailsService.getProductById(id);
+//        return new ResponseEntity<>(product, HttpStatus.OK);
+//    }
+//
+//    @GetMapping
+//    public ResponseEntity<List<ProductDTO>> getAllProducts() {
+//        List<ProductDTO> products = productDetailsService.getAllProducts();
+//        return ResponseEntity.ok(products);
+//    }
+//
+//    @GetMapping("/search")
+//    public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String keyword) {
+//        List<ProductDTO> products = productDetailsService.searchProducts(keyword);
+//        return ResponseEntity.ok(products);
+//    }
+
+
+
+    @GetMapping(value = "/details/{isSingleProductCheckOut}/{productId}")
+    public ResponseEntity<?> getProductDetailsByIdOrCategory(@PathVariable(name = "isSingleProductCheckOut")
+                                              boolean isSingleProductCheckOut,
+                                              @PathVariable(name = "productId") Integer productId,
+                                              @RequestParam(name = "category", required = false) String category ) throws Exception{
+        List<ProductDetails> products = productService.getProductDetailsByIdOrCategory(isSingleProductCheckOut,productId, category);
+
         return new ResponseEntity<>(products,HttpStatus.OK);
     }
 }

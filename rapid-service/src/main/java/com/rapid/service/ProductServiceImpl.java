@@ -2,12 +2,13 @@ package com.rapid.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rapid.core.dto.*;
+import com.rapid.core.dto.product.ImagesDTO;
+import com.rapid.core.dto.product.ProductDTO;
+import com.rapid.core.dto.product.ReviewDTO;
+import com.rapid.core.dto.product.SizeDTO;
 import com.rapid.core.entity.ConfigurationKeys;
 import com.rapid.core.entity.order.CartItem;
-import com.rapid.core.entity.product.ImageModel;
-import com.rapid.core.entity.product.ProductImages;
-import com.rapid.core.entity.product.ProductSizePrice;
-import com.rapid.core.entity.product.Products;
+import com.rapid.core.entity.product.*;
 import com.rapid.dao.*;
 import com.rapid.security.JwtRequestFilter;
 import com.rapid.security.JwtTokenDetails;
@@ -16,11 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,6 +35,9 @@ public class ProductServiceImpl implements ProductService{
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private ProductDetailsRepository productDetailsRepository;
 
     @Autowired
     CartItemRepository cartItemRepository;
@@ -57,6 +60,8 @@ public class ProductServiceImpl implements ProductService{
     @Autowired
     private ConfigurationKeyRepo configurationKeyRepo;
 
+
+
     @Override
     public Products addNewProduct(Products products) {
         log.info("Product: {} has been added by admin",products.getProductName());
@@ -68,12 +73,16 @@ public class ProductServiceImpl implements ProductService{
     @Override
     public Set<ImageModel> uploadImage(MultipartFile [] multipartFiles) throws IOException {
         Set<ImageModel> imageModels  = new HashSet<>();
+        boolean isPrimaryImage = true;
         for (MultipartFile file : multipartFiles){
+
             ImageModel imageModel = new ImageModel(
                     file.getOriginalFilename(),
                     file.getContentType(),
                     file.getBytes()
             );
+            imageModel.setPrimaryImage(isPrimaryImage);
+            isPrimaryImage = false;
             imageModelRepository.saveAndFlush(imageModel);
             imageModels.add(imageModel);
         }
@@ -222,4 +231,56 @@ public class ProductServiceImpl implements ProductService{
         return saveProduct;
 
     }
+
+    @Override
+    public Set<ImagesDTO> uploadProductImage(MultipartFile[] file) throws IOException {
+
+        Set<ImagesDTO> imagesDTOS =  new HashSet<>();
+        for (MultipartFile file1: file){
+            ImagesDTO imagesDTO = new ImagesDTO(file1.getOriginalFilename(),
+                    file1.getContentType(),
+                    file1.getBytes());
+            ImageModel imageModel = new ImageModel(imagesDTO);
+
+            imageModelRepository.saveAndFlush(imageModel);
+            imagesDTOS.add(imagesDTO);
+        }
+        return imagesDTOS;
+
+
+
+    }
+
+    @Override
+    public ProductDetails createNewProduct(MultipartFile[] file, ProductDTO productDTO) throws IOException {
+        Set<ImageModel> imageModels =  uploadImage(file);
+        ProductDetails productDetails = new ProductDetails(productDTO,imageModels);
+        productDetailsRepository.saveAndFlush(productDetails);
+        return  productDetails;
+
+    }
+
+    @Override
+    public List<ProductDetails> getProductDetailsByIdOrCategory(boolean isSingleProductCheckOut,
+                           Integer productId, String category) throws Exception {
+        List<ProductDetails> productDetails = new ArrayList<>();
+        if (isSingleProductCheckOut) {
+            ProductDetails products = productDetailsRepository.findById(productId).orElseThrow(() -> new Exception("Product not found!"));
+            List<ProductDetails> detailsRepositoryByCategory = productDetailsRepository.findByCategory(category);
+
+            List<RelatedProduct> relatedProducts = new ArrayList<>();
+            for (ProductDetails relatedProductDetails : detailsRepositoryByCategory) {
+                Set<ImageModel> imageModels= imageModelRepository.findByProductId(relatedProductDetails.getId());
+                RelatedProduct relatedProduct = new RelatedProduct(relatedProductDetails,imageModels);
+                relatedProducts.add(relatedProduct);
+            }
+            products.setRelatedProducts(relatedProducts);
+            productDetails.add(products);
+        }
+
+          return productDetails;
+
+    }
+
+
 }
