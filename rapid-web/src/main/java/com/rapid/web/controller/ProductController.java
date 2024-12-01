@@ -81,13 +81,36 @@ public class ProductController {
 
 
 
-    @GetMapping(value = "/details/{isSingleProductCheckOut}/{productId}")
-    public ResponseEntity<?> getProductDetailsByIdOrCategory(@PathVariable(name = "isSingleProductCheckOut")
-                                              boolean isSingleProductCheckOut,
-                                              @PathVariable(name = "productId") Integer productId,
-                                              @RequestParam(name = "category", required = false) String category ) throws Exception{
-        List<ProductDetails> products = productService.getProductDetailsByIdOrCategory(isSingleProductCheckOut,productId, category);
+    @GetMapping(value = "/details/{productId}")
+    public ResponseEntity<?> getProductDetailsByIdOrCategory(@PathVariable(name = "productId") Integer productId ) throws Exception{
+        List<ProductDetails> products = productService.getProductDetailsByIdOrCategory(productId);
 
         return new ResponseEntity<>(products,HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/all-details")
+    public ResponseEntity<?> getProductDetailsByCategory(@RequestParam(defaultValue = "0") Integer pageNumber,
+                                                         @RequestParam String searchKey ) throws Exception{
+        Page<ProductDetails> products = productService.getProductDetailsByCategory(searchKey,pageNumber);
+
+        return new ResponseEntity<>(products,HttpStatus.OK);
+    }
+
+
+
+    @GetMapping(value = "/all/details")
+    public ResponseEntity<?> getAllProductDetail(@RequestParam(defaultValue = "0") Integer pageNumber,
+                                                 @RequestParam("category") String category,
+                                                 @RequestParam("sub_category") String subCategory) throws Exception{
+        Page<ProductDetails> products = productService.getAllProductDetail(pageNumber);
+        return new ResponseEntity<>(products,HttpStatus.OK);
+    }
+
+
+    @GetMapping(value = "/category-details")
+    public ResponseEntity<?> getProductDetailsByCategory(
+            @RequestParam("category") String category) throws Exception {
+        List<ProductDetails> products = productService.getProductDetailsByCategory(category);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 }

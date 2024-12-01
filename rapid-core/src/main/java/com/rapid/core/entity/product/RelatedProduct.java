@@ -27,6 +27,8 @@ public class RelatedProduct implements Serializable {
 
     private Set<ImageModel> productImages;
 
+
+
     public RelatedProduct(ProductDetails relatedProductDetails, Set<ImageModel> imageModels) {
         this.name = relatedProductDetails.getName();
         this.subtitle = relatedProductDetails.getSubtitle();

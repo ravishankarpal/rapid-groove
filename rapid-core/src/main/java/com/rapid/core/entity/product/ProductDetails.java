@@ -41,6 +41,9 @@ public class ProductDetails implements Serializable {
     @Column(length = 1000)
     private String category;
 
+    @Column(length = 1000)
+    private String subCategory;
+
 //    @Embedded
 //    private ProductPrice price;
 

@@ -39,5 +39,11 @@ public interface ProductService {
 
     ProductDetails createNewProduct(MultipartFile[] file, ProductDTO productDTO) throws IOException;
 
-    List<ProductDetails> getProductDetailsByIdOrCategory(boolean isSingleProductCheckOut, Integer productId, String category) throws Exception;
+    List<ProductDetails> getProductDetailsByIdOrCategory(Integer productId) throws Exception;
+
+    Page<ProductDetails> getProductDetailsByCategory(String searchKey, Integer pageNumber);
+
+    Page<ProductDetails> getAllProductDetail(Integer pageNumber);
+
+    List<ProductDetails> getProductDetailsByCategory(String category);
 }

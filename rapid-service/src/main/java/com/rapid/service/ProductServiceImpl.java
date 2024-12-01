@@ -261,26 +261,61 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public List<ProductDetails> getProductDetailsByIdOrCategory(boolean isSingleProductCheckOut,
-                           Integer productId, String category) throws Exception {
+    public List<ProductDetails> getProductDetailsByIdOrCategory(Integer productId) throws Exception {
         List<ProductDetails> productDetails = new ArrayList<>();
-        if (isSingleProductCheckOut) {
-            ProductDetails products = productDetailsRepository.findById(productId).orElseThrow(() -> new Exception("Product not found!"));
-            List<ProductDetails> detailsRepositoryByCategory = productDetailsRepository.findByCategory(category);
-
-            List<RelatedProduct> relatedProducts = new ArrayList<>();
-            for (ProductDetails relatedProductDetails : detailsRepositoryByCategory) {
-                Set<ImageModel> imageModels= imageModelRepository.findByProductId(relatedProductDetails.getId());
-                RelatedProduct relatedProduct = new RelatedProduct(relatedProductDetails,imageModels);
-                relatedProducts.add(relatedProduct);
-            }
-            products.setRelatedProducts(relatedProducts);
-            productDetails.add(products);
+        ProductDetails products = productDetailsRepository.findById(productId).orElseThrow(() -> new Exception("Product not found!"));
+        List<ProductDetails> detailsRepositoryByCategory = productDetailsRepository.findBySubCategory(products.getSubCategory());
+        List<RelatedProduct> relatedProducts = new ArrayList<>();
+        for (ProductDetails relatedProductDetails : detailsRepositoryByCategory) {
+            Set<ImageModel> imageModels = imageModelRepository.findBySubCategory(products.getSubCategory());
+            RelatedProduct relatedProduct = new RelatedProduct(relatedProductDetails, imageModels);
+            relatedProducts.add(relatedProduct);
         }
-
-          return productDetails;
+        products.setRelatedProducts(relatedProducts);
+        productDetails.add(products);
+        return productDetails;
 
     }
 
+    @Override
+    public Page<ProductDetails> getProductDetailsByCategory(String searchKey, Integer pageNumber) {
+        Pageable pageable = PageRequest.of(pageNumber,100);
+        Page<ProductDetails> productDetails = productDetailsRepository.findByNameOrCategoryContainingIgnoreCase(searchKey, pageable);
+
+        productDetails.getContent().forEach(pd -> {
+            Set<ImageModel> primaryImages = pd.getProductImages().stream()
+                    .filter(pm -> pm.isPrimaryImage())
+                    .collect(Collectors.toSet());
+            pd.setProductImages(primaryImages);
+        });
+        return productDetails;
+    }
+
+    @Override
+    public Page<ProductDetails> getAllProductDetail(Integer pageNumber) {
+        Pageable pageable = PageRequest.of(pageNumber,100);
+        Page<ProductDetails> productDetails = productDetailsRepository.findAll(pageable);
+        productDetails.getContent().forEach(pd -> {
+            Set<ImageModel> primaryImages = pd.getProductImages().stream()
+                    .filter(pm -> pm.isPrimaryImage())
+                    .collect(Collectors.toSet());
+            pd.setProductImages(primaryImages);
+        });
+        return productDetails;
+    }
+
+    @Override
+    public List<ProductDetails> getProductDetailsByCategory(String category) {
+
+        List<ProductDetails> productDetails = productDetailsRepository.findByCategory(category);
+        productDetails.forEach(pd -> {
+            Set<ImageModel> primaryImages = pd.getProductImages().stream()
+                    .filter(pm -> pm.isPrimaryImage())
+                    .collect(Collectors.toSet());
+            pd.setProductImages(primaryImages);
+        });
+        return productDetails;
+
+    }
 
 }
