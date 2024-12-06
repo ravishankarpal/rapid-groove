@@ -494,8 +494,6 @@ public class CartServiceImpl implements CartService{
         if (cartDetails == null) {
             cartDetails = new CartDetails(user);
         }
-
-        // Ensure only the primary images are returned for products in the cart
         cartDetails.getCartItemDetails().forEach(cartItem -> {
             Set<ImageModel> primaryImages = cartItem.getProduct().getProductImages().stream()
                     .filter(ImageModel::isPrimaryImage)
@@ -511,24 +509,8 @@ public class CartServiceImpl implements CartService{
                     .collect(Collectors.toList());
             product.setSizes(filteredSizes);
         });
-//        cartDetails.getCartItemDetails().forEach(cartItem -> {
-//            cartItem.getProduct().setRating(null);
-//            cartItem.getProduct().setReviews(null);
-//            ProductDetails product = cartItem.getProduct();
-//            ProductSize selectedSize = cartItem.getSelectedSize();
-//
-//            List<ProductSize> filteredSizes = product.getSizes().stream()
-//                    .filter(size -> size.getValue().equals(selectedSize.getValue()))
-//                    .collect(Collectors.toList());
-//            product.setSizes(filteredSizes);
-//        });
-        cartDetails.setUser(null);
-//        cartDetails.getCartItemDetails().forEach(cart-> {
-//            cart.getProduct().setRating(null);
-//            cart.getProduct().setReviews(null);
-//
-//        });
 
+        cartDetails.setUser(null);
         return cartDetails;
 
     }
