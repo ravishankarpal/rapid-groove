@@ -5,6 +5,7 @@ import com.rapid.core.dto.UserAddressDTO;
 import com.rapid.core.dto.UserResponse;
 import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.User;
+import com.rapid.core.entity.UserAddress;
 import com.rapid.service.UserService;
 import com.rapid.service.exception.RapidGrooveException;
 import jakarta.mail.MessagingException;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -88,6 +91,27 @@ public class UserController {
         }
     }
 
+    @GetMapping (value = "/address-details")
+    public ResponseEntity<?> getUserAddressDetails(){
+        List<UserAddress> userAddresses =  userService.getUserAddressDetails();
+        return  new ResponseEntity<>(userAddresses,HttpStatus.OK);
+
+    }
+
+    @DeleteMapping(value = "delete-address/{id}")
+    public ResponseEntity<?> deleteUserAddress(@PathVariable("id") Integer id){
+        userService.deleteUserAddress(id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @PutMapping (value = "/update-address/{id}")
+    public ResponseEntity<?> updateUserAddressDetails(@PathVariable("id") Integer id,
+                                                      @RequestBody UserAddressDTO userAddressDTO){
+        userService.updateUserAddressDetails(id,userAddressDTO);
+        return  new ResponseEntity<>(HttpStatus.OK);
+
+    }
 
 
 

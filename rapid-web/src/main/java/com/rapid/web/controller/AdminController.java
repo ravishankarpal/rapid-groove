@@ -2,8 +2,11 @@ package com.rapid.web.controller;
 
 import com.rapid.core.dto.DeliveryAvailabilityDTO;
 import com.rapid.core.dto.ProductDetailDTO;
+import com.rapid.core.dto.product.ImagesDTO;
+import com.rapid.core.dto.product.ProductDTO;
 import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.product.ImageModel;
+import com.rapid.core.entity.product.ProductDetails;
 import com.rapid.core.entity.product.Products;
 import com.rapid.security.JwtTokenDetails;
 import com.rapid.service.ProductService;
@@ -18,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -104,6 +108,20 @@ public class AdminController {
             Products products = productService.addNewProductByAdmin(productDetailDTO, file);
             return new ResponseEntity<>(products,HttpStatus.OK);
 
+
+    }
+
+
+
+    @PostMapping(value = "/product/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Object> create(@RequestPart("product") ProductDTO productDTO,
+                                                @RequestPart("file") MultipartFile[] file) throws IOException {
+
+        //Set<ImagesDTO> imagesDTOS = productService.uploadProductImage(file);
+
+
+        ProductDetails productDetails=  productService.createNewProduct(file, productDTO);
+        return new ResponseEntity<>(productDetails, HttpStatus.OK);
 
     }
 }

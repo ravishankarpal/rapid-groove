@@ -205,4 +205,42 @@ public class UserServiceImpl implements  UserService{
 
     }
 
+    @Override
+    public List<UserAddress> getUserAddressDetails() {
+
+        String currentUser = JwtRequestFilter.CURRENT_USER;
+        User user = userRepository.findById(currentUser).orElseThrow(()-> new RuntimeException("User Not found"));
+
+        List<UserAddress> userAddresses = userAddressRepository.findByUser(user);
+
+        for (UserAddress userAddress : userAddresses){
+            user = null;
+            userAddress.setUser(user);
+        }
+        return  userAddresses;
+
+    }
+
+    @Override
+    public void deleteUserAddress(Integer id) {
+        String currentUser = JwtRequestFilter.CURRENT_USER;
+        User user = userRepository.findById(currentUser).orElseThrow(()-> new RuntimeException("User Not found"));
+        userAddressRepository.deleteById(id);
+    }
+
+    @Override
+    public void updateUserAddressDetails(Integer id, UserAddressDTO userAddressDTO) {
+        String userName = JwtRequestFilter.CURRENT_USER;
+        log.info("Request received to update user address details for user name {}", userName);
+        if (id != null && Objects.nonNull(userAddressDTO) && StringUtils.isNotBlank(userName)) {
+            UserAddress userAddress = userAddressRepository.findById(id).
+                    orElseThrow(() -> new RuntimeException("User Address not found"));
+            UserAddress address = new UserAddress(userAddressDTO);
+            address.setId(userAddress.getId());
+            address.setUser(userAddress.getUser());
+            userAddressRepository.saveAndFlush(address);
+
+        }
+    }
+
 }

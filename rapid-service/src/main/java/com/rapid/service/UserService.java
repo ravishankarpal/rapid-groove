@@ -6,8 +6,11 @@ import com.rapid.core.dto.UserAddressDTO;
 import com.rapid.core.dto.UserResponse;
 import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.User;
+import com.rapid.core.entity.UserAddress;
 import com.rapid.service.exception.RapidGrooveException;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.List;
 
 
 public interface UserService {
@@ -27,4 +30,10 @@ public interface UserService {
 
 
     void registerComplain(ComplainDTO complainDTO) throws RapidGrooveException ;
+
+    List<UserAddress> getUserAddressDetails();
+
+    void deleteUserAddress(Integer id);
+
+    void updateUserAddressDetails(Integer id, UserAddressDTO userAddressDTO);
 }
