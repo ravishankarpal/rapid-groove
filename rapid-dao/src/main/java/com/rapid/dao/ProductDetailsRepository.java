@@ -29,4 +29,17 @@ public interface ProductDetailsRepository extends JpaRepository<ProductDetails, 
     List<ProductDetails> findBySubCategory(String category);
 
 
+//    @Query(name = "select * from  product_details where lower(name) like lower(concat('%', :key, '%')) " +
+//            "or lower(category) like lower(concat('%', :key, '%'))  or lower(sub_category) like lower(concat('%', :key, '%')) " +
+//            "limit :pageSize offset :pageable", nativeQuery = true)
+//    Page<ProductDetails> findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCaseOrSubCategoryContainingIgnoreCase( String key,Pageable pageable);
+//
+
+
+    @Query("SELECT p FROM ProductDetails p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :key, '%')) " +
+            "OR LOWER(p.category) LIKE LOWER(CONCAT('%', :key, '%')) " +
+            "OR LOWER(p.subCategory) LIKE LOWER(CONCAT('%', :key, '%'))")
+    Page<ProductDetails> findByNameOrCategoryOrSubCategory(@Param("key") String key, Pageable pageable);
+
+
 }

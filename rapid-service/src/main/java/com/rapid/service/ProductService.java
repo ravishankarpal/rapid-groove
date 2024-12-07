@@ -46,4 +46,6 @@ public interface ProductService {
     Page<ProductDetails> getAllProductDetail(Integer pageNumber);
 
     List<ProductDetails> getProductDetailsByCategory(String category);
+
+    Page<ProductDetails> searchProductDetails(String key, int page, int size);
 }

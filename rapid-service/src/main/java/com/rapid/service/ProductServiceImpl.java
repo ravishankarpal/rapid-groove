@@ -318,4 +318,30 @@ public class ProductServiceImpl implements ProductService{
 
     }
 
+    @Override
+    public Page<ProductDetails> searchProductDetails(String key,int page, int pageSize) {
+
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<ProductDetails> productDetailsPageable =productDetailsRepository
+                .findByNameOrCategoryOrSubCategory(key,pageable);
+
+        productDetailsPageable.getContent().forEach(pd -> {
+            Set<ImageModel> primaryImages = pd.getProductImages().stream()
+                    .filter(pm -> pm.isPrimaryImage())
+                    .collect(Collectors.toSet());
+            pd.setProductImages(primaryImages);
+            pd.setReviews(null);
+            pd.setSizes(pd.getSizes().stream()
+                    .filter(size -> Boolean.TRUE.equals(size.getAvailable()))
+                    .findFirst()
+                    .map(Collections::singletonList)
+                    .orElse(Collections.emptyList()));
+            pd.setDeliveryInfo(null);
+
+        });
+
+        return productDetailsPageable;
+
+    }
+
 }
