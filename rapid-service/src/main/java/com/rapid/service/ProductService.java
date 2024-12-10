@@ -2,7 +2,10 @@ package com.rapid.service;
 
 import com.rapid.core.dto.ProductDetailDTO;
 import com.rapid.core.dto.ProductDetailResponse;
+import com.rapid.core.dto.product.ImagesDTO;
+import com.rapid.core.dto.product.ProductDTO;
 import com.rapid.core.entity.product.ImageModel;
+import com.rapid.core.entity.product.ProductDetails;
 import com.rapid.core.entity.product.Products;
 import com.rapid.service.exception.RapidGrooveException;
 import org.springframework.data.domain.Page;
@@ -30,4 +33,19 @@ public interface ProductService {
     List<ProductDetailResponse> getProductDetail(boolean isSingleProductCheckOut, Integer productId);
 
     Products addNewProductByAdmin(ProductDetailDTO productDetailDTO, MultipartFile[] file) throws RapidGrooveException;
+
+
+    Set<ImagesDTO> uploadProductImage(MultipartFile[] file) throws IOException;
+
+    ProductDetails createNewProduct(MultipartFile[] file, ProductDTO productDTO) throws IOException;
+
+    List<ProductDetails> getProductDetailsByIdOrCategory(Integer productId) throws Exception;
+
+    Page<ProductDetails> getProductDetailsByCategory(String searchKey, Integer pageNumber);
+
+    Page<ProductDetails> getAllProductDetail(Integer pageNumber);
+
+    List<ProductDetails> getProductDetailsByCategory(String category);
+
+    Page<ProductDetails> searchProductDetails(String key, int page, int size);
 }

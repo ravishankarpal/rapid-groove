@@ -1,6 +1,8 @@
 package com.rapid.service;
 
 import com.rapid.core.dto.*;
+import com.rapid.core.dto.cart.CartRequestDTO;
+import com.rapid.core.entity.cart.CartDetails;
 import com.rapid.core.entity.order.CartItem;
 import com.rapid.service.exception.RapidGrooveException;
 import jakarta.validation.Valid;
@@ -24,4 +26,11 @@ public interface CartService {
 
 
     CheckoutResponse getCheckoutDetails() throws RapidGrooveException;
+
+
+    void addItemToCartV2(CartRequestDTO cartRequestDTO) throws Exception;
+
+    CartDetails getItem() throws Exception;
+
+    void delete(Long cartItemId) throws Exception;
 }

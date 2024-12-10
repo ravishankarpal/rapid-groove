@@ -2,6 +2,8 @@ package com.rapid.web.controller;
 
 
 import com.rapid.core.dto.*;
+import com.rapid.core.dto.cart.CartRequestDTO;
+import com.rapid.core.entity.cart.CartDetails;
 import com.rapid.core.entity.order.CartItem;
 import com.rapid.service.CartService;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
@@ -80,6 +82,26 @@ public class CartController {
         return new ResponseEntity<>(checkoutResponse,HttpStatus.OK);
     }
 
+    @PostMapping  (value = "/v2/addItemToCart")
+    public ResponseEntity<?> addItemToCartV2(@RequestBody CartRequestDTO cartRequestDTO) throws Exception {
+        cartService.addItemToCartV2(cartRequestDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/get")
+    public ResponseEntity<?> getItem() throws Exception {
+        CartDetails cartDetails = cartService.getItem();
+        return new ResponseEntity<>(cartDetails,HttpStatus.OK);
+
+    }
+
+
+    @DeleteMapping(value = "delete/{cartItemId}")
+    public ResponseEntity<?> deleteCartDetailsItem(@PathVariable("cartItemId") Long cartId) throws Exception {
+        cartService.delete(cartId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 
 
