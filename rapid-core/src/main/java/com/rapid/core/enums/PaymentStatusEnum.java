@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum PaymentStatusEnum {
 
 
+    INITIATED("Initiated"),
     SUCCESS("Success"),
     PENDING("Pending"),
     COD("cod"),
