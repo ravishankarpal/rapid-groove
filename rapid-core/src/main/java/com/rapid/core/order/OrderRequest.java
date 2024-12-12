@@ -39,7 +39,6 @@ public class OrderRequest {
     private double shippingCost;
 
 
-
     @NotNull
     @Size(min = 1)
     private List<OrderItemRequest> items;

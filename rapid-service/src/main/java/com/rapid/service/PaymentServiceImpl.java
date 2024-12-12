@@ -73,7 +73,7 @@ public class PaymentServiceImpl implements PaymentService{
 
     @Override
     public void attemptPayment() {
-        PaymentRequestDTO paymentRequestDTO = new PaymentRequestDTO();
+        PaymentRequestDTO paymentRequestDTO = null;
         PaymentResponse paymentResponse=  initiatePayment(paymentRequestDTO);
         PaymentResponse response =  verifyPayment(paymentRequestDTO.getOrderId());
         String payload = null;

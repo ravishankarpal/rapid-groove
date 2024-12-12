@@ -4,7 +4,9 @@ package com.rapid.web.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rapid.core.dto.OrderDto;
+import com.rapid.core.dto.payment.PaymentRequestDTO;
 import com.rapid.core.dto.payment.PaymentResponse;
+import com.rapid.core.entity.User;
 import com.rapid.core.entity.order.OrderDetail;
 import com.rapid.core.entity.order.OrderDetails;
 import com.rapid.core.entity.order.OrderItem;
@@ -91,30 +93,19 @@ public class OrderController {
 
     @PostMapping("/create")
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest) throws Exception {
-        try {
-            OrderDetail orderDetail = service.createOrder(orderRequest);
-            Map<String, Object> paymentPayload = paymentService.preparePaymentPayload(orderDetail);
-            ResponseEntity<String> paymentResponse = paymentService.sendPaymentRequest(paymentPayload);
-            if (paymentResponse.getStatusCode() == HttpStatus.OK) {
-                JsonNode responseBody = new ObjectMapper().readTree(paymentResponse.getBody());
-                String transactionId = responseBody.path("transactionId").asText();
-                orderDetail.setPaymentTransactionId(transactionId);
-                orderDetail.updateOrderStatus(OrderStatus.PROCESSING);
-                OrderDetail updatedOrder = service.updateOrder(orderDetail);
-                return ResponseEntity.ok(OrderResponse.builder()
-                        .orderId(updatedOrder.getOrderId())
-                        .status(updatedOrder.getOrderStatus())
-                        .paymentTransactionId(transactionId)
-                        .build());
-            }
 
-            throw new PaymentProcessingException("Payment processing failed");
-
-        } catch (Exception e) {
-           // log.error("Error creating order", e);
-//            throw new OrderCreationException("Failed to create order: " + e.getMessage());
-            throw new Exception("Failed to create order: " + e.getMessage());
-        }
+        OrderDetail orderDetail = service.createOrder(orderRequest);
+        PaymentRequestDTO paymentRequestDTO = preparePaymentRequest(orderDetail);
+        PaymentResponse paymentResponse = paymentService.initiatePayment(paymentRequestDTO);
+        orderDetail.setPaymentTransactionId(paymentResponse.getPaymentSessionId());
+        orderDetail.updateOrderStatus(OrderStatus.PAYMENT_PENDING);
+        OrderDetail updatedOrder = service.updateOrder(orderDetail);
+        return ResponseEntity.ok(OrderResponse.builder()
+                .orderId(updatedOrder.getOrderId())
+                .status(updatedOrder.getOrderStatus())
+                .paymentTransactionId(paymentResponse.getPaymentSessionId())
+                .paymentLink(paymentResponse.getPaymentLink())
+                .build());
     }
 
 
@@ -156,6 +147,18 @@ public class OrderController {
                         .size(item.getSize())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+
+    private PaymentRequestDTO preparePaymentRequest(OrderDetail orderDetail) {
+        User user = orderDetail.getUser();
+
+        return PaymentRequestDTO.builder()
+                .orderId(String.valueOf(orderDetail.getOrderId()))
+                .amount(orderDetail.getTotalAmount().doubleValue())
+                .email(user.getEmail())
+                .name(user.getName())
+                .build();
     }
 
 

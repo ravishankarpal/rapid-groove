@@ -18,4 +18,5 @@ public class OrderResponse {
     private UUID orderId;
     private OrderStatus status;
     private String paymentTransactionId;
+    private String paymentLink;
 }

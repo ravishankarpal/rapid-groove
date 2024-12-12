@@ -11,7 +11,8 @@ public enum OrderStatus {
     SHIPPED("Shipped"),
     DELIVERED("Delivered"),
     RETURNED("Returned"),
-    CANCELLED("Cancelled");
+    CANCELLED("Cancelled"),
+    PAYMENT_PENDING("Payment Pending");
 
     private final String status;
 
