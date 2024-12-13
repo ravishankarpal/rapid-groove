@@ -3,7 +3,11 @@ package com.rapid.service;
 
 import com.rapid.core.dto.PaymentRequestDTO;
 import com.rapid.core.dto.PaymentResponseDTO;
+import com.rapid.core.dto.orders.OrderResponse;
+import com.rapid.core.dto.payment.AuthenticatePaymentRequest;
+import com.rapid.core.dto.payment.PaymentRequest;
 import com.rapid.core.entity.Payment;
+import com.rapid.core.enums.EndPoint;
 import com.rapid.core.enums.PaymentStatusEnum;
 import com.rapid.core.exception.InvalidPaymentException;
 import com.rapid.core.exception.PaymentProcessingException;
@@ -11,7 +15,10 @@ import com.rapid.dao.PaymentRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
@@ -20,6 +27,16 @@ public class PaymentServiceImpl implements PaymentService{
 
     @Autowired
     private PaymentRepository paymentRepository;
+
+
+    @Value("${cashfree.base.url}")
+    private String cashFreeBaseUrl;
+
+    @Autowired
+    private OrderService orderService;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
 
     @Override
@@ -45,6 +62,8 @@ public class PaymentServiceImpl implements PaymentService{
             throw new PaymentProcessingException("Payment processing failed: " + e.getMessage());
         }
     }
+
+
 
 
     private void validatePaymentRequest(PaymentRequestDTO request) {
@@ -112,6 +131,25 @@ public class PaymentServiceImpl implements PaymentService{
         } catch (InterruptedException e) {
             throw new PaymentProcessingException("Card payment processing failed");
         }
+    }
+
+
+
+    @Override
+    public void authenticatePayment(String paymentId, AuthenticatePaymentRequest authenticatePaymentRequest) throws Exception {
+
+        HttpHeaders httpHeaders = orderService.getCashFreeHeaders();
+        StringBuilder apiUrl = new StringBuilder();
+        apiUrl.append(cashFreeBaseUrl).append(EndPoint.SUBMIT_OTP.getEndPoint()).append(paymentId);
+
+        HttpEntity<AuthenticatePaymentRequest> entity = new HttpEntity<>(authenticatePaymentRequest, httpHeaders);
+        ResponseEntity<String> response  = restTemplate.exchange(apiUrl.toString(), HttpMethod.POST, entity, String.class);
+//        if (response.getStatusCode() == HttpStatus.OK){
+//            return response.getBody();
+//        }else{
+//            throw new Exception("Error while creating order with Cashfree");
+//        }
+
     }
 
 }

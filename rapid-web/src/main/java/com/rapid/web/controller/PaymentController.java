@@ -3,15 +3,13 @@ package com.rapid.web.controller;
 
 import com.rapid.core.dto.PaymentRequestDTO;
 import com.rapid.core.dto.PaymentResponseDTO;
+import com.rapid.core.dto.payment.AuthenticatePaymentRequest;
 import com.rapid.core.exception.InvalidPaymentException;
 import com.rapid.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "rapid/payment")
@@ -32,5 +30,13 @@ public class PaymentController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new PaymentResponseDTO(false, "Payment processing failed: " + e.getMessage()));
         }
+    }
+
+
+    @PostMapping(value = "/authenticate-payment/{orderId}")
+    public ResponseEntity<?> authenticatePayment(@PathVariable("cf_payment_id") String paymentId,
+                                                 @RequestBody AuthenticatePaymentRequest authenticatePaymentRequest) throws Exception {
+        paymentService.authenticatePayment(paymentId,authenticatePaymentRequest);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

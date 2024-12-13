@@ -3,6 +3,9 @@ package com.rapid.web.controller;
 
 import com.rapid.core.dto.OrderDto;
 import com.rapid.core.dto.OrderUpdate;
+import com.rapid.core.dto.orders.OrderExtend;
+import com.rapid.core.dto.orders.OrderResponse;
+import com.rapid.core.dto.payment.PaymentRequest;
 import com.rapid.core.entity.order.OrderDetails;
 import com.rapid.service.OrderService;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
@@ -62,6 +65,44 @@ public class OrderController {
 //        orderTrackingService.sendOrderUpdate(orderUpdate);
 //        return ResponseEntity.ok("Order status updated successfully");
 //    }
+
+    @PostMapping("/create-order")
+    public ResponseEntity<?> createOrder(@RequestBody PaymentRequest paymentRequest) throws Exception {
+
+       OrderResponse orderResponse = orderService.createOrder(paymentRequest);
+        return new ResponseEntity<>(orderResponse,HttpStatus.OK);
+    }
+
+
+    @GetMapping("/details/{order_id}")
+    public ResponseEntity<?> getOrder(@PathVariable("order_id") String orderId) throws Exception {
+        OrderResponse orderResponse = orderService.getOrder(orderId);
+        return new ResponseEntity<>(orderResponse,HttpStatus.OK);
+    }
+
+
+    @PatchMapping("/terminate/{order_id}")
+    public ResponseEntity<?> terminateOrder(@PathVariable("order_id") String orderId) throws Exception {
+        OrderResponse orderResponse = orderService.terminateOrder(orderId);
+        return new ResponseEntity<>(orderResponse,HttpStatus.OK);
+    }
+
+
+
+    @PatchMapping("/extend/{order_id}")
+    public ResponseEntity<?> getOrderExtend(@PathVariable("order_id") String orderId) throws Exception {
+        OrderResponse orderResponse = orderService.getOrderExtend(orderId);
+        return new ResponseEntity<>(orderResponse,HttpStatus.OK);
+    }
+
+
+    @PatchMapping("update/extend/{order_id}")
+    public ResponseEntity<?> getOrderExtend(@PathVariable("order_id") String orderId,
+                                            @RequestBody OrderExtend orderExtend) throws Exception {
+        OrderResponse orderResponse = orderService.updateOrderExtend(orderId, orderExtend);
+        return new ResponseEntity<>(orderResponse,HttpStatus.OK);
+    }
+
 
 
 }
