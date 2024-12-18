@@ -100,10 +100,9 @@ public class ProductController {
 
 
     @GetMapping(value = "/all/details")
-    public ResponseEntity<?> getAllProductDetail(@RequestParam(defaultValue = "0") Integer pageNumber,
-                                                 @RequestParam("category") String category,
-                                                 @RequestParam("sub_category") String subCategory) throws Exception{
-        Page<ProductDetails> products = productService.getAllProductDetail(pageNumber);
+    public ResponseEntity<?> getAllProductDetail(@RequestParam(value = "page-number",defaultValue = "0") int pageNumber,
+                                                 @RequestParam(value = "size", defaultValue = "100") int size) throws Exception{
+        Page<ProductDetails> products = productService.getAllProductDetail(pageNumber,size);
         return new ResponseEntity<>(products,HttpStatus.OK);
     }
 
