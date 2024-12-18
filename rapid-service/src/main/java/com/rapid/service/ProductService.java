@@ -43,7 +43,7 @@ public interface ProductService {
 
     Page<ProductDetails> getProductDetailsByCategory(String searchKey, Integer pageNumber);
 
-    Page<ProductDetails> getAllProductDetail(Integer pageNumber);
+    Page<ProductDetails> getAllProductDetail(int pageNumber, int size);
 
     List<ProductDetails> getProductDetailsByCategory(String category);
 
