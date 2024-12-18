@@ -3,6 +3,7 @@ package com.rapid.service;
 import com.rapid.core.dto.OrderDto;
 import com.rapid.core.entity.User;
 import com.rapid.core.entity.order.Cart;
+import com.rapid.core.entity.order.OrderDetail;
 import com.rapid.core.entity.order.OrderDetails;
 import com.rapid.core.dto.OrderProductQuantityDto;
 import com.rapid.core.entity.product.Products;
@@ -17,15 +18,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class OrderServiceImpl implements OrderService{
+public class OrderDetailsServiceImpl implements OrderDetailsService {
 
     @Autowired
     private OrderRepository orderRepository;
@@ -47,6 +48,12 @@ public class OrderServiceImpl implements OrderService{
 
     @Autowired
     private PdfService pdfService;
+
+
+    @Autowired
+    private OrderDetailRepository orderDetailRepository;
+
+
     @Override
     public void placeOrder(OrderDto orderDto, boolean isSingleCartCheckOut) throws MessagingException, IOException {
             String currentUser = JwtRequestFilter.CURRENT_USER;
@@ -101,6 +108,7 @@ public class OrderServiceImpl implements OrderService{
         return  orderRepository.findByUser_Email(userName);
     }
 
+
     private OrderDetails createOrderDetails(OrderDto orderDto, Products product, User user,
                                             OrderProductQuantityDto orderProductQuantityDto) {
         return new OrderDetails(
@@ -119,6 +127,27 @@ public class OrderServiceImpl implements OrderService{
                 user
         );
     }
+
+
+
+    @Override
+    public OrderDetail createOrder(OrderDetail order) {
+        validateOrder(order);
+        order.setOrderDate(LocalDateTime.now());
+        order.setOrderStatus(OrderStatus.PENDING);
+        return orderDetailRepository.saveAndFlush(order);
+    }
+
+    private void validateOrder(OrderDetail order) {
+
+        // Implement order validation logic
+        // Check product availability
+        // Validate shipping and billing addresses
+        // Validate payment method
+    }
+
+
+
 
 
 

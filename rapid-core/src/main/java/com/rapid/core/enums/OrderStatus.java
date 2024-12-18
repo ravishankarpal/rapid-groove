@@ -10,7 +10,9 @@ public enum OrderStatus {
     PROCESSING("Pending"),
     SHIPPED("Shipped"),
     DELIVERED("Delivered"),
-    CANCELLED("Cancelled");
+    RETURNED("Returned"),
+    CANCELLED("Cancelled"),
+    PAYMENT_PENDING("Payment Pending");
 
     private final String status;
 
