@@ -292,8 +292,8 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Page<ProductDetails> getAllProductDetail(Integer pageNumber) {
-        Pageable pageable = PageRequest.of(pageNumber,100);
+    public Page<ProductDetails> getAllProductDetail(int pageNumber, int size) {
+        Pageable pageable = PageRequest.of(pageNumber,size);
         Page<ProductDetails> productDetails = productDetailsRepository.findAll(pageable);
         productDetails.getContent().forEach(pd -> {
             Set<ImageModel> primaryImages = pd.getProductImages().stream()
