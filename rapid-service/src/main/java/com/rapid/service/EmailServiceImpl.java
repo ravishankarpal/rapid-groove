@@ -29,7 +29,7 @@ public class EmailServiceImpl implements  EmailService{
     @Override
     public void sendOrderConfirmationEmail(List<OrderDetails> orderDetails) throws MessagingException, IOException {
         OrderDetails orderDetail = orderDetails.get(0);
-        String to = orderDetail.getOrderEmail();
+        String to = orderDetail.getCustomerDetails().getCustomerEmail();
         String subject = "Order Confirmation";
         String body = buildOrderConfirmationEmailBody(orderDetails);
         sendOrderConfirmationEmailHelper(to, subject, body,orderDetails);
@@ -73,9 +73,9 @@ public class EmailServiceImpl implements  EmailService{
         // Table rows
         for (OrderDetails order : orderDetails) {
             body.append("<tr>");
-            body.append("<td>").append(order.getProduct().getProductName()).append("</td>");
-            body.append("<td>").append(order.getTotalQuantity()).append("</td>");
-            body.append("<td>").append(order.getTotalPrice()).append("</td>");
+            body.append("<td>").append(order.getCartDetails().getCartItems().get(0).getItemName()).append("</td>");
+            body.append("<td>").append(order.getCartDetails().getCartItems().get(0).getItemQuantity()).append("</td>");
+            body.append("<td>").append(order.getOrderAmount()).append("</td>");
             body.append("</tr>");
         }
 
@@ -91,7 +91,7 @@ public class EmailServiceImpl implements  EmailService{
     private Double calculateTotalPrice(List<OrderDetails> orderDetails) {
 
         return orderDetails.stream()
-                .mapToDouble(OrderDetails::getTotalPrice)
+                .mapToDouble(OrderDetails::getOrderAmount)
                 .sum();
 
     }

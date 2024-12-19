@@ -1,13 +1,20 @@
 package com.rapid.core.entity.order;
 
+import com.rapid.core.dto.cart.CartDetail;
+import com.rapid.core.dto.orders.CustomerDetails;
+import com.rapid.core.dto.orders.OrderMetaData;
+import com.rapid.core.dto.orders.OrderResponse;
+import com.rapid.core.dto.payment.PaymentRequest;
+
 import com.rapid.core.entity.User;
-import com.rapid.core.entity.product.Products;
 import com.rapid.core.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.Date;
+
+import java.time.LocalDateTime;
+
 
 @Getter
 @Setter
@@ -16,66 +23,70 @@ import java.util.Date;
 @NoArgsConstructor
 public class OrderDetails {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer orderId;
+    @Column(name = "id", nullable = false, length = 50)
+    private String orderId;
 
-    @Column(name = "name")
-    private String orderName;
+    @Column(name = "cf_order_id", length = 50)
+    private String cfOrderId;
 
-    @Column(name = "phone")
-    private Long orderPhone;
+    @Embedded
+    private CustomerDetails customerDetails;
 
-    @Column(name = "alternate_phone")
-    private Long orderAlterNatePhone;
+//    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JoinColumn(name = "order_id")
+//    private List<CartItem> cartItems = new ArrayList<>();
 
-    @Column(name = "email")
-    private String orderEmail;
+    @Embedded
+    @AssociationOverride(
+            name = "orderCartItems"
 
-    @Column(name = "total_quantity")
-    private Integer totalQuantity;
+    )
+    private OrderCartDetails cartDetails;
 
-    @Column(name = "total_price")
-    private Double totalPrice;
+    @Embedded
+    private OrderMetaData orderMeta;
 
+    @Column(name = "order_amount")
+    private double orderAmount;
 
-    @Column(name = "shipping_address",length = 1000)
-    private String shippingAddress;
+    @Column(name = "order_currency", length = 10)
+    private String orderCurrency;
 
-    @Column(name = "order_date")
-    private Date orderDate;
+    @Column(name = "order_note", length = 255)
+    private String orderNote;
 
-    private String order_status;
+    @Column(name = "order_status", length = 20)
+    @Enumerated(EnumType.STRING)
+    private OrderStatus orderStatus;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Products product;
+    @Column(name = "payment_session_id", length = 1000)
+    private String paymentSessionId;
 
-    @Column(name = "delivery_fee")
-    private Double deliveryFee;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Column(name = "order_expiry_time")
+    private String orderExpiryTime;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
 
-    public OrderDetails(String orderName, Long orderPhone, Long orderAlterNatePhone,
-                        String orderEmail, Integer totalQuantity, String  shippingAddress , Date orderDate,
-                        Double totalPrice, String order_status, Products product, User user) {
-        this.orderName = orderName;
-        this.orderPhone = orderPhone;
-        this.orderAlterNatePhone = orderAlterNatePhone;
-        this.orderEmail = orderEmail;
-        this.totalQuantity = totalQuantity;
-        this.shippingAddress = shippingAddress;
-        this.orderDate = orderDate;
-        this.totalPrice = totalPrice;
-        this.order_status = order_status;
-        this.product = product;
-        this.user = user;
+    public OrderDetails(OrderResponse orderResponse, PaymentRequest paymentRequest){
+        this.orderId = orderResponse.getOrderId();
+
+
+       // this.cartDetails = paymentRequest.getCartDetails();
+        this.cfOrderId = orderResponse.getCfOrderId();
+        this.customerDetails = orderResponse.getCustomerDetails();
+        this.orderAmount = orderResponse.getOrder_amount();
+        this.orderCurrency = orderResponse.getOrderCurrency();
+        this.orderExpiryTime = orderResponse.getOrderExpiryTime();
+        this.orderMeta = orderResponse.getOrderMetaData();
+        this.orderNote = orderResponse.getOrderNote();
+        this.orderStatus = OrderStatus.valueOf(orderResponse.getOrderStatus());
+        this.paymentSessionId = orderResponse.getPaymentSessionId();
     }
-
-
-
 
 }

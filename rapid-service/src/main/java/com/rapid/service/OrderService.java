@@ -14,7 +14,6 @@ import java.util.List;
 public interface OrderService {
     void placeOrder(OrderDto orderDto, boolean isSingleCartCheckOut) throws MessagingException, IOException;
 
-    List<OrderDetails> getMyOrderDetails();
 
     OrderResponse createOrder(PaymentRequest paymentRequest) throws Exception;
 

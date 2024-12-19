@@ -1,6 +1,7 @@
 package com.rapid.core.dto.orders;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Embeddable
 public class CustomerDetails {
 
     @JsonProperty(value = "customer_id")

@@ -46,11 +46,11 @@ public class OrderController {
         }
     }
 
-    @GetMapping(value = "/myorder/details")
-    public ResponseEntity<?> getMyOrderDetails(){
-        List<OrderDetails> orderDetails = orderService.getMyOrderDetails();
-        return new ResponseEntity<>(orderDetails,HttpStatus.OK);
-    }
+//    @GetMapping(value = "/myorder/details")
+//    public ResponseEntity<?> getMyOrderDetails(){
+//        List<OrderDetails> orderDetails = orderService.getMyOrderDetails();
+//        return new ResponseEntity<>(orderDetails,HttpStatus.OK);
+//    }
 
 
 //    @PostMapping(value = "/{orderId}/status")

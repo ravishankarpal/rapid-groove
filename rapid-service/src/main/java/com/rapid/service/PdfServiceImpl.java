@@ -30,16 +30,16 @@ public class PdfServiceImpl implements PdfService{
             // Add content to the PDF
             contentStream.beginText();
             contentStream.newLineAtOffset(20, 700);
-            contentStream.showText("Invoice for " + orderDetails.get(0).getOrderName());
+            contentStream.showText("Invoice for " + "orderDetails.get(0).getOrderName()");
             contentStream.newLine();
 
             // Add order details
             for (OrderDetails order : orderDetails) {
-                contentStream.showText("Item: " + order.getProduct().getProductName());
+                contentStream.showText("Item: " + "order.getProduct().getProductName()");
                 contentStream.newLine();
-                contentStream.showText("Quantity: " + order.getTotalQuantity());
+                contentStream.showText("Quantity: " + "order.getTotalQuantity()");
                 contentStream.newLine();
-                contentStream.showText("Price: " + order.getTotalPrice());
+                contentStream.showText("Price: " + "order.getTotalPrice()");
                 contentStream.newLine();
                 contentStream.newLine();
             }
@@ -142,19 +142,19 @@ public class PdfServiceImpl implements PdfService{
         float nextX = margin;
         contentStream.beginText();
         contentStream.newLineAtOffset(nextX, yPosition - 15);
-        contentStream.showText(order.getProduct().getProductName());
+        contentStream.showText("order.getProduct().getProductName()");
         contentStream.endText();
 
         nextX += 150;
         contentStream.beginText();
         contentStream.newLineAtOffset(nextX, yPosition - 15);
-        contentStream.showText(String.valueOf(order.getTotalQuantity()));
+        contentStream.showText(String.valueOf("order.getTotalQuantity()"));
         contentStream.endText();
 
         nextX += 100;
         contentStream.beginText();
         contentStream.newLineAtOffset(nextX, yPosition - 15);
-        contentStream.showText(formatCurrency(order.getTotalPrice()));
+        contentStream.showText("order.getTotalPrice()");
         contentStream.endText();
     }
 
@@ -166,7 +166,7 @@ public class PdfServiceImpl implements PdfService{
 
 
     private double calculateTotalPrice(List<OrderDetails> orderDetails) {
-        return orderDetails.stream().mapToDouble(OrderDetails::getTotalPrice).sum();
+        return orderDetails.stream().mapToDouble(OrderDetails::getOrderAmount).sum();
     }
 }
 

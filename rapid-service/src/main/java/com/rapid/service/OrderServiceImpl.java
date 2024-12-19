@@ -2,9 +2,11 @@ package com.rapid.service;
 
 import com.rapid.core.dto.Constant;
 import com.rapid.core.dto.OrderDto;
+import com.rapid.core.dto.cart.CartDetail;
 import com.rapid.core.dto.orders.OrderExtend;
 import com.rapid.core.dto.orders.OrderResponse;
 import com.rapid.core.dto.payment.PaymentRequest;
+import com.rapid.core.entity.order.OrderCartDetails;
 import com.rapid.core.enums.EndPoint;
 import com.rapid.core.entity.ConfigurationKeys;
 import com.rapid.core.entity.User;
@@ -76,7 +78,8 @@ public class OrderServiceImpl implements OrderService{
                     productRepository.findById(orderProductQuantityDto.getProductId()).ifPresentOrElse(
                             product -> {
                                 log.info("Going to place an order for user :{}", currentUser);
-                                OrderDetails orderDetail = createOrderDetails(orderDto, product, user.get(), orderProductQuantityDto);
+//                                OrderDetails orderDetail = createOrderDetails(orderDto, product, user.get(), orderProductQuantityDto);
+                                OrderDetails orderDetail = new OrderDetails();
                                 // clearing the cart After order placed
                                 if(!isSingleCartCheckOut){                                 cartItemRepository.getCartDetails(currentUser);
                                    List<Cart> carts =  cartRepository.findCartByUserId(currentUser);
@@ -98,12 +101,12 @@ public class OrderServiceImpl implements OrderService{
                 }
                 if (!orderDetails.isEmpty()){
                     orderRepository.saveAllAndFlush(orderDetails);
-                    for(OrderDetails order : orderDetails) {
-                        log.info("Order for product: {}  by user: {} has been placed successfully!  " +
-                                        "Order details : [ID: {}, Quantity: {}, Total Price: {}]",
-                                order.getProduct().getProductName(), currentUser, order.getOrderId(),
-                                order.getTotalQuantity(), order.getTotalPrice());
-                    }
+//                    for(OrderDetails order : orderDetails) {
+//                        log.info("Order for product: {}  by user: {} has been placed successfully!  " +
+//                                        "Order details : [ID: {}, Quantity: {}, Total Price: {}]",
+//                                order.getProduct().getProductName(), currentUser, order.getOrderId(),
+//                                order.getTotalQuantity(), order.getTotalPrice());
+//                    }
                     emailService.sendOrderConfirmationEmail(orderDetails);
                     log.info("Email has been successfully sent to user :{}",currentUser);
                 }
@@ -112,61 +115,45 @@ public class OrderServiceImpl implements OrderService{
             }
     }
 
-    @Override
-    public List<OrderDetails> getMyOrderDetails() {
-        String userName = JwtRequestFilter.CURRENT_USER;
-        return  orderRepository.findByUser_Email(userName);
-    }
-
-
-
-    private OrderDetails createOrderDetails(OrderDto orderDto, Products product, User user,
-                                            OrderProductQuantityDto orderProductQuantityDto) {
-        return new OrderDetails(
-                orderDto.getFullName(),
-                orderDto.getPhoneNumber(),
-                orderDto.getAlternatePhoneNumber(),
-                orderDto.getEmail(),
-                orderProductQuantityDto.getQuantity(),
-                orderDto.getShippingAddress(),
-                new Date(),
-                (product.getProductActualPrice() *
-                        orderProductQuantityDto.getQuantity()) -
-                        (product.getProductDiscountPrice()*orderProductQuantityDto.getQuantity()),
-                OrderStatus.ORDER_PLACED.getStatus(),
-                product,
-                user
-        );
-    }
+//    private OrderDetails createOrderDetails(OrderDto orderDto, Products product, User user,
+//                                            OrderProductQuantityDto orderProductQuantityDto) {
+//        return new OrderDetails(
+//                orderDto.getFullName(),
+//                orderDto.getPhoneNumber(),
+//                orderDto.getAlternatePhoneNumber(),
+//                orderDto.getEmail(),
+//                orderProductQuantityDto.getQuantity(),
+//                orderDto.getShippingAddress(),
+//                new Date(),
+//                (product.getProductActualPrice() *
+//                        orderProductQuantityDto.getQuantity()) -
+//                        (product.getProductDiscountPrice()*orderProductQuantityDto.getQuantity()),
+//                OrderStatus.ORDER_PLACED.getStatus(),
+//                product,
+//                user
+//        );
+//    }
 
 
     @Override
     public OrderResponse createOrder(PaymentRequest paymentRequest) throws Exception {
         log.info("going to create an order");
+        String userName = JwtRequestFilter.CURRENT_USER;
         HttpHeaders httpHeaders  = getCashFreeHeaders();
-//        Map<String, Object> requestPayload = new HashMap<>();
-//        requestPayload.put("order_id", paymentRequest.getOrderId());
-//        requestPayload.put("order_amount", paymentRequest.getOrderAmount());
-//        requestPayload.put("order_currency", paymentRequest.getOrderCurrency());
-//        Map<String, String> customerDetails = new HashMap<>();
-//        customerDetails.put("customer_id", UUID.randomUUID().toString());
-//        customerDetails.put("customer_name", paymentRequest.getCustomerDetails().getCustomerName());
-//        customerDetails.put("customer_email", paymentRequest.getCustomerDetails().getCustomerEmail());
-//        customerDetails.put("customer_phone", paymentRequest.getCustomerDetails().getCustomerPhone());
-//        requestPayload.put("customer_details", customerDetails);
-//
-//        Map<String, String> orderMeta = new HashMap<>();
-//        orderMeta.put("return_url", paymentRequest.getOrderMetaData().getReturnUrl());
-//        orderMeta.put("notify_url", paymentRequest.getOrderMetaData().getNotifyUrl());
-//        orderMeta.put("payment_methods", "cc,dc,upi");
-//        requestPayload.put("order_meta", orderMeta);
         StringBuilder apiUrl = new StringBuilder();
         apiUrl.append(cashFreeBaseUrl).append(EndPoint.PG_ORDERS.getEndPoint());
 
         HttpEntity<PaymentRequest> entity = new HttpEntity<>(paymentRequest, httpHeaders);
         ResponseEntity<OrderResponse> response  = restTemplate.exchange(apiUrl.toString(), HttpMethod.POST, entity, OrderResponse.class);
         if (response.getStatusCode() == HttpStatus.OK){
-            return response.getBody();
+            OrderResponse orderResponse = response.getBody();
+            OrderDetails orderDetails = new OrderDetails(orderResponse,paymentRequest);
+            orderDetails.setUser(userRepository.findById(JwtRequestFilter.CURRENT_USER).orElseThrow(()-> new Exception("User not found!")));
+            CartDetail cartDetail =  paymentRequest.getCartDetails();
+            OrderCartDetails orderCartDetails = new OrderCartDetails(cartDetail);
+            orderDetails.setCartDetails(orderCartDetails);
+            orderRepository.saveAndFlush(orderDetails);
+            return orderResponse;
         }else{
             throw new Exception("Error while creating order with Cashfree");
         }
