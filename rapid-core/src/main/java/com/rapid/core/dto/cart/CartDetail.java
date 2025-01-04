@@ -1,4 +1,5 @@
 package com.rapid.core.dto.cart;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -16,8 +17,9 @@ import java.util.List;
 @Embeddable
 public class CartDetail {
 
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonProperty(value = "shipping_charge")
-    private double shippingCharge;
+    private Double shippingCharge;
 
     @JsonProperty(value = "cart_name")
     private String cartName;

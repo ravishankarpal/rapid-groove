@@ -2,20 +2,28 @@ package com.rapid.web.controller;
 
 
 import com.rapid.core.dto.OrderDto;
-import com.rapid.core.dto.OrderUpdate;
 import com.rapid.core.dto.orders.OrderExtend;
+import com.rapid.core.dto.orders.CashFreeOrderResponse;
+import com.rapid.core.dto.orders.OrderRequest;
 import com.rapid.core.dto.orders.OrderResponse;
-import com.rapid.core.dto.payment.PaymentRequest;
-import com.rapid.core.entity.order.OrderDetails;
+import com.rapid.core.enums.OrderStatus;
+import com.rapid.service.EmailService;
 import com.rapid.service.OrderService;
+import com.rapid.service.PdfService;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/order")
@@ -23,6 +31,14 @@ public class OrderController {
 
     @Autowired
     private OrderService orderService;
+
+
+    @Autowired
+    private EmailService emailService;
+
+
+    @Autowired
+    private PdfService pdfService;
 
 
 
@@ -67,23 +83,23 @@ public class OrderController {
 //    }
 
     @PostMapping("/create-order")
-    public ResponseEntity<?> createOrder(@RequestBody PaymentRequest paymentRequest) throws Exception {
+    public ResponseEntity<?> createOrder(@RequestBody OrderRequest paymentRequest) throws Exception {
 
-       OrderResponse orderResponse = orderService.createOrder(paymentRequest);
+       CashFreeOrderResponse orderResponse = orderService.createOrder(paymentRequest);
         return new ResponseEntity<>(orderResponse,HttpStatus.OK);
     }
 
 
-    @GetMapping("/details/{order_id}")
-    public ResponseEntity<?> getOrder(@PathVariable("order_id") String orderId) throws Exception {
-        OrderResponse orderResponse = orderService.getOrder(orderId);
-        return new ResponseEntity<>(orderResponse,HttpStatus.OK);
-    }
+//    @GetMapping("/details/{order_id}")
+//    public ResponseEntity<?> getOrder(@PathVariable("order_id") String orderId) throws Exception {
+//        CashFreeOrderResponse orderResponse = orderService.getOrder(orderId);
+//        return new ResponseEntity<>(orderResponse,HttpStatus.OK);
+//    }
 
 
     @PatchMapping("/terminate/{order_id}")
     public ResponseEntity<?> terminateOrder(@PathVariable("order_id") String orderId) throws Exception {
-        OrderResponse orderResponse = orderService.terminateOrder(orderId);
+        CashFreeOrderResponse orderResponse = orderService.terminateOrder(orderId);
         return new ResponseEntity<>(orderResponse,HttpStatus.OK);
     }
 
@@ -91,7 +107,7 @@ public class OrderController {
 
     @PatchMapping("/extend/{order_id}")
     public ResponseEntity<?> getOrderExtend(@PathVariable("order_id") String orderId) throws Exception {
-        OrderResponse orderResponse = orderService.getOrderExtend(orderId);
+        CashFreeOrderResponse orderResponse = orderService.getOrderExtend(orderId);
         return new ResponseEntity<>(orderResponse,HttpStatus.OK);
     }
 
@@ -99,10 +115,49 @@ public class OrderController {
     @PatchMapping("update/extend/{order_id}")
     public ResponseEntity<?> getOrderExtend(@PathVariable("order_id") String orderId,
                                             @RequestBody OrderExtend orderExtend) throws Exception {
-        OrderResponse orderResponse = orderService.updateOrderExtend(orderId, orderExtend);
+        CashFreeOrderResponse orderResponse = orderService.updateOrderExtend(orderId, orderExtend);
         return new ResponseEntity<>(orderResponse,HttpStatus.OK);
+    }
+
+    @PostMapping("/test/email/{order_id}")
+    public ResponseEntity<?> sendOrderConfirmationEmail(@PathVariable("order_id") String orderId) throws MessagingException, IOException {
+        orderService.sendOrderConfirmationEmail(orderId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
 
+    @GetMapping("/v2/details")
+    public ResponseEntity<Page<OrderResponse>> getOrders(
+            @RequestParam(required = false) String period,
+            @RequestParam(defaultValue = "ACTIVE", required = false) String status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        OrderStatus orderStatus = OrderStatus.valueOf(status);
+        Page<OrderResponse> orderResponses =  orderService.getOrders( period, orderStatus, page, size);
+        return ResponseEntity.ok(orderResponses);
+    }
+
+    @GetMapping("/details/{id}")
+    public ResponseEntity<?> getOrderDetailsById(@PathVariable("id") String id){
+
+        OrderResponse response = orderService.getOrderDetailsById(id);
+        return ResponseEntity.ok(response);
+
+    }
+
+    @PostMapping("/invoice/{order_id}")
+    public ResponseEntity<?> generateInvoice(@PathVariable("order_id") String orderId) throws FileNotFoundException {
+        String userHome = System.getProperty("user.home");
+        String pdfPath = userHome + File.separator + "downloads" + File.separator + "invoice_" + orderId + ".pdf";
+
+        pdfService.generatePDF(orderId,pdfPath);
+        return new ResponseEntity<>(HttpStatus.OK);
+
+    }
+
+
+
+
 }
+

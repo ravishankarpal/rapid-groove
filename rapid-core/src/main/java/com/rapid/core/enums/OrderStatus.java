@@ -8,17 +8,12 @@ import lombok.NoArgsConstructor;
 public enum OrderStatus {
 
     ORDER_PLACED(),
+    NOT_SHIPPED_YET,
+    SHIPPED(),
     PENDING(),
     PROCESSING(),
-    SHIPPED(),
     DELIVERED(),
     CANCELLED(),
     ACTIVE();
-
-    //private final String status;
-
-//    OrderStatus(String status){
-//        this.status = status;
-//    }
 
 }

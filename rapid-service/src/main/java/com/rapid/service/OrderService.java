@@ -2,29 +2,35 @@ package com.rapid.service;
 
 import com.rapid.core.dto.OrderDto;
 import com.rapid.core.dto.orders.OrderExtend;
+import com.rapid.core.dto.orders.CashFreeOrderResponse;
+import com.rapid.core.dto.orders.OrderRequest;
 import com.rapid.core.dto.orders.OrderResponse;
-import com.rapid.core.dto.payment.PaymentRequest;
-import com.rapid.core.entity.order.OrderDetails;
+import com.rapid.core.enums.OrderStatus;
 import jakarta.mail.MessagingException;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
 
 import java.io.IOException;
-import java.util.List;
 
 public interface OrderService {
     void placeOrder(OrderDto orderDto, boolean isSingleCartCheckOut) throws MessagingException, IOException;
 
 
-    OrderResponse createOrder(PaymentRequest paymentRequest) throws Exception;
+    CashFreeOrderResponse createOrder(OrderRequest paymentRequest) throws Exception;
 
-    OrderResponse getOrder(String orderId) throws Exception;
+    CashFreeOrderResponse getOrder(String orderId) throws Exception;
 
-    OrderResponse terminateOrder(String orderId) throws Exception;
+    CashFreeOrderResponse terminateOrder(String orderId) throws Exception;
 
-    OrderResponse getOrderExtend(String orderId) throws Exception;
+    CashFreeOrderResponse getOrderExtend(String orderId) throws Exception;
 
-    OrderResponse updateOrderExtend(String orderId, OrderExtend orderExtend ) throws Exception;
+    CashFreeOrderResponse updateOrderExtend(String orderId, OrderExtend orderExtend ) throws Exception;
 
     public HttpHeaders getCashFreeHeaders() throws Exception;
 
+    void sendOrderConfirmationEmail(String orderId) throws MessagingException, IOException;
+
+    Page<OrderResponse> getOrders(String period, OrderStatus status, int page, int size);
+
+    OrderResponse getOrderDetailsById(String id);
 }
