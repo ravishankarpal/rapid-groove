@@ -1,7 +1,5 @@
 package com.rapid.core.dto.cart;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,17 +12,18 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Embeddable
 public class CartDetail {
 
-    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     @JsonProperty(value = "shipping_charge")
-    private Double shippingCharge;
+    private double shippingCharge;
 
     @JsonProperty(value = "cart_name")
     private String cartName;
 
     @JsonProperty(value = "cart_items")
     private List<CartItems> cartItems;
+
+
+
 
 }

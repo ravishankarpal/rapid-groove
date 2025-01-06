@@ -2,6 +2,7 @@ package com.rapid.core.entity.order;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.rapid.core.entity.product.ProductSizePrice;
+import com.rapid.core.entity.product.Products;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,7 +34,9 @@ public class CartItem {
     @Column(name = "size")
     private Integer size;
 
-
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Products products;
 
 
     @ManyToOne

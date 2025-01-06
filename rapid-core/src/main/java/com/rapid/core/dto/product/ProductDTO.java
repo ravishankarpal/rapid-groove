@@ -21,7 +21,6 @@ public class ProductDTO {
    // private PriceDTO price;
     private RatingDTO rating;
     private String category;
-    private String subCategory;
     private List<SizeDTO> sizes;
     private List<String> specifications;
     private List<ReviewDTO> reviews;

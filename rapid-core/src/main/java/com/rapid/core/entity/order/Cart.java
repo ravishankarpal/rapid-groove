@@ -2,6 +2,7 @@ package com.rapid.core.entity.order;
 
 
 import com.rapid.core.entity.User;
+import com.rapid.core.entity.product.Products;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

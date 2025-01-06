@@ -3,9 +3,6 @@ package com.rapid.web.controller;
 
 import com.rapid.core.dto.*;
 import com.rapid.core.dto.cart.CartRequestDTO;
-import com.rapid.core.dto.checkout.CheckoutDTO;
-import com.rapid.core.dto.checkout.CheckoutRequest;
-import com.rapid.core.dto.checkout.CheckoutRequestResponse;
 import com.rapid.core.entity.cart.CartDetails;
 import com.rapid.core.entity.order.CartItem;
 import com.rapid.service.CartService;
@@ -27,6 +24,22 @@ public class CartController {
     private CartService cartService;
    // @PreAuthorize("hasRole('User')")
 
+    @PostMapping  (value = "/addToCart/{productId}")
+    public ResponseEntity<?> addToCart(@PathVariable(name = "productId") Integer productId){
+        try {
+            cartService.addToCart(productId);
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        catch (ProductDetailsNotFoundException e){
+            return new ResponseEntity<HttpStatus>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping(value = "/details")
+    public ResponseEntity<?> getCartCartDetailsFomUserToken(){
+        List<CartItemResponseDTO> cartItemResponseDTO =  cartService.getCartCartDetailsFomUserToken();
+        return new ResponseEntity<>(cartItemResponseDTO,HttpStatus.OK);
+    }
 
 
     @GetMapping(value = "/cart_details")
@@ -41,6 +54,13 @@ public class CartController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+
+    @PostMapping  (value = "/addItemToCart")
+    public ResponseEntity<?> addItemToCart(@RequestBody AddToCartRequestDTO cartRequestDTO) throws RapidGrooveException {
+            cartService.addItemToCart(cartRequestDTO);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+    }
 
     @PutMapping(value = "/update-quantity")
     public ResponseEntity<?> updateCartQuantity(@RequestBody UpdateCartDTO updateCartDTO) throws Exception {
@@ -81,18 +101,6 @@ public class CartController {
     public ResponseEntity<?> deleteCartDetailsItem(@PathVariable("cartItemId") Long cartId) throws Exception {
         cartService.delete(cartId);
         return new ResponseEntity<>(HttpStatus.OK);
-    }
-
-    @PostMapping("/save/checkout")
-    public ResponseEntity<?> saveCheckoutDetails(@RequestBody CheckoutRequest checkoutRequest){
-        CheckoutRequestResponse checkoutRequestResponse = cartService.saveCheckoutDetails(checkoutRequest);
-        return ResponseEntity.ok(checkoutRequestResponse);
-    }
-
-    @PostMapping("/checkout/details")
-    public ResponseEntity<?> getCheckoutDetails(@RequestBody CheckoutDTO checkoutDTO) throws Exception {
-       com.rapid.core.dto.checkout.CheckoutResponse checkoutItemResponse =  cartService.getCheckoutDetails(checkoutDTO);
-        return ResponseEntity.ok(checkoutItemResponse);
     }
 
 

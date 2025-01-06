@@ -14,7 +14,7 @@ import java.util.Set;
 @Setter
 public class RelatedProduct implements Serializable {
 
-    private Integer id;
+
     private String name;
 
     private String subtitle;
@@ -30,7 +30,6 @@ public class RelatedProduct implements Serializable {
 
 
     public RelatedProduct(ProductDetails relatedProductDetails, Set<ImageModel> imageModels) {
-        this.id= relatedProductDetails.getId();
         this.name = relatedProductDetails.getName();
         this.subtitle = relatedProductDetails.getSubtitle();
         this.description = relatedProductDetails.getDescription();

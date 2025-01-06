@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Set;
 
 public interface ImageModelRepository extends JpaRepository<ImageModel,Integer> {
@@ -16,10 +15,6 @@ public interface ImageModelRepository extends JpaRepository<ImageModel,Integer> 
             "im.primary_image = 1 and pm.product_id in " +
             "(select pd.id from product_details pd  where pd.sub_category =:category)", nativeQuery = true)
     Set<ImageModel> findBySubCategory(@Param("category") String category);
-
-    @Query(value = "select im.pic_byte from image_model im join product_images pi on im.id= pi.image_id " +
-            "where pi.product_id = :productId and im.primary_image = true", nativeQuery = true)
-    byte[] findImageByProductId(@Param("productId") Integer productId);
 
 
 
