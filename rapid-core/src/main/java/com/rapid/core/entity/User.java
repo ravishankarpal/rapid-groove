@@ -23,6 +23,10 @@ public class User {
     @Column(name = "password")
     private String password;
 
+//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+//    private Cart cart;
+
+    // many user might have many roles
     @ManyToMany(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
     @JoinTable(name = "USER_ROLE",
     joinColumns = {

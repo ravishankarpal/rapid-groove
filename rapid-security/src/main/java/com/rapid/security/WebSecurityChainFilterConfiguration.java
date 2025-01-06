@@ -50,7 +50,7 @@ public class WebSecurityChainFilterConfiguration  {
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/authenticate","rapid/user/**",
                             "/admin/product/**","/product/**","admin/**","rapid/cart/**",
-                            "/rapid/otp/**","/order/**", "/rapid/payment/**").permitAll();
+                            "/rapid/otp/**").permitAll();
                 })
                 .httpBasic(Customizer.withDefaults());
         return http.build();

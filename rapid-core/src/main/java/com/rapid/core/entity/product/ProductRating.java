@@ -1,7 +1,6 @@
 package com.rapid.core.entity.product;
 
 
-import com.rapid.core.dto.product.RateReviewRequest;
 import com.rapid.core.dto.product.RatingDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -32,9 +31,5 @@ public class ProductRating {
         this.average = rating.getAverage();
         this.totalRatings = rating.getTotalRatings();
         this.totalReviews = rating.getTotalReviews();
-    }
-
-    public ProductRating(RateReviewRequest rateReviewRequest) {
-
     }
 }

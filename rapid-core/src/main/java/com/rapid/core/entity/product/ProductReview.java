@@ -1,8 +1,6 @@
 package com.rapid.core.entity.product;
 
-import com.rapid.core.dto.product.RateReviewRequest;
 import com.rapid.core.dto.product.ReviewDTO;
-import com.rapid.core.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,13 +31,6 @@ public class ProductReview {
         this.name = reviewDTO.getUserName();
         this.rating = reviewDTO.getRating();
         this.comment = reviewDTO.getComment();
-        this.date = new Date();
-    }
-
-    public ProductReview(RateReviewRequest rateReviewRequest, User user) {
-        this.name = user.getName();
-        this.rating = rateReviewRequest.getRating();
-        this.comment = rateReviewRequest.getReviewComment();
         this.date = new Date();
     }
 }

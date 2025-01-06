@@ -16,7 +16,6 @@ public class ProductDetailDTO {
     private String productName;
     private String productDescription;
     private String productCategory;
-    private String productSubCategory;
     private Integer productRating;
     private Integer ratingsCount;
     private Integer reviewsCount;

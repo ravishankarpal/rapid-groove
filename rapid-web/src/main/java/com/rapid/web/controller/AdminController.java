@@ -2,10 +2,12 @@ package com.rapid.web.controller;
 
 import com.rapid.core.dto.DeliveryAvailabilityDTO;
 import com.rapid.core.dto.ProductDetailDTO;
+import com.rapid.core.dto.product.ImagesDTO;
 import com.rapid.core.dto.product.ProductDTO;
 import com.rapid.core.entity.DeliveryAvailability;
 import com.rapid.core.entity.product.ImageModel;
 import com.rapid.core.entity.product.ProductDetails;
+import com.rapid.core.entity.product.Products;
 import com.rapid.security.JwtTokenDetails;
 import com.rapid.service.ProductService;
 import com.rapid.service.admin.AdminService;
@@ -17,7 +19,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -33,7 +37,40 @@ public class AdminController {
     @Autowired
     private AdminService adminService;
 
+    @PostMapping(value = "/product/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Object> addNewProduct(@RequestPart("product") Products products,
+                                                @RequestPart("imageFile") MultipartFile[] file) {
+        try {
+            String role = jwtTokenDetails.extractUserRole();
+            //if (role.equalsIgnoreCase("ADMIN")) {
+                Set<ImageModel> images = productService.uploadImage(file);
+                products.setProductImages(images);
+                Products prod = productService.addNewProduct(products);
+                return new ResponseEntity<>(prod, HttpStatus.OK);
+//            } else {
+//                return new ResponseEntity<>("Access Denied!", HttpStatus.UNAUTHORIZED);
+//            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
+    }
+
+    @GetMapping(value = "/product/details")
+
+    @DeleteMapping(value = "product/delete/{productId}")
+    public ResponseEntity<?> deleteProduct(@PathVariable Integer productId){
+
+        String role = jwtTokenDetails.extractUserRole();
+        if (role.equalsIgnoreCase("ADMIN")) {
+            productService.deleteProduct(productId);
+            return new ResponseEntity<>(HttpStatus.OK);
+
+        } else {
+            return new ResponseEntity<>("Access Denied!", HttpStatus.UNAUTHORIZED);
+        }
+
+    }
 
 
     @PostMapping(value = "product/upload/image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -62,6 +99,16 @@ public class AdminController {
     public ResponseEntity<?> updateDeliveryAvailability(@RequestBody DeliveryAvailabilityDTO deliveryAvailability) throws RapidGrooveException {
         DeliveryAvailability updateDeliveryAvailability = adminService.updateDeliveryAvailability(deliveryAvailability);
         return new ResponseEntity<>(updateDeliveryAvailability, HttpStatus.OK);
+    }
+
+
+    @PostMapping(value = "/add", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> addNewProductByAdmin(@RequestPart("product") ProductDetailDTO productDetailDTO,
+                                                @RequestPart("imageFile") MultipartFile[] file) throws RapidGrooveException {
+            Products products = productService.addNewProductByAdmin(productDetailDTO, file);
+            return new ResponseEntity<>(products,HttpStatus.OK);
+
+
     }
 
 
