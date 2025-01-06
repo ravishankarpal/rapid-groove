@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface EmailService {
 
-   void sendOrderConfirmationEmail(List<OrderDetails> orderDetails) throws MessagingException, IOException;
+   void sendOrderConfirmationEmail(OrderDetails orderDetails) throws MessagingException, IOException;
 
    void sendOTPEmail(User user, String otp) throws MessagingException;
 }

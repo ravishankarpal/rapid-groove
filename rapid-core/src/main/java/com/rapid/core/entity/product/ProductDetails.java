@@ -96,9 +96,9 @@ public class ProductDetails implements Serializable {
         this.name = productDTO.getName();
         this.subtitle = productDTO.getSubtitle();
         this.description = productDTO.getDescription();
-       // this.price = new ProductPrice(productDTO.getPrice());
         this.rating = new ProductRating(productDTO.getRating());
         this.category = productDTO.getCategory();
+        this.subCategory = productDTO.getSubCategory();
         this.productImages = imageModels;
         List<ProductSize> productSizes = new ArrayList<>();
         for (SizeDTO sizeDTO: productDTO.getSizes()){
