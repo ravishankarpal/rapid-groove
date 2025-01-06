@@ -23,13 +23,16 @@ public class ProductItem {
     private double discount;
 
     private byte image[];
+    private String size;
 
     public ProductItem(OrderProductDetails orderProductDetails) {
         this.productId = orderProductDetails.getProductId();
         this.productName = orderProductDetails.getProductName();
         this.quantity = orderProductDetails.getQuantity();
         this.price = orderProductDetails.getOriginalUnitPrice();
-        this.discount = orderProductDetails.getDiscountedUnitPrice();
+        Integer discountAmt = (int) orderProductDetails.getDiscountedUnitPrice();
+        this.discount = discountAmt;
+        this.size=orderProductDetails.getSize();
 
         //this.image = orderProductDetails.getProductId()
 

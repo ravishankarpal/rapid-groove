@@ -92,6 +92,7 @@ public class OrderDetails {
         this.orderNote = orderResponse.getOrderNote();
         this.orderStatus = OrderStatus.valueOf(orderResponse.getOrderStatus());
         this.paymentSessionId = orderResponse.getPaymentSessionId();
+        this.createdAt = LocalDateTime.now();
         CartDetail cartDetails = paymentRequest.getCartDetails();
         if(cartDetails.getShippingCharge() ==null) {
             this.shippingCharge = 0.0;
@@ -103,7 +104,8 @@ public class OrderDetails {
             OrderProductDetails orderProductDetails = new OrderProductDetails(items);
             orderProducts.add(orderProductDetails);
         }
-
+        this.deliveryInfo= new DeliverInfoDetails();
+        this.deliveryInfo.setOrderId(orderResponse.getOrderId());
     }
 
 }

@@ -22,6 +22,7 @@ import com.rapid.security.JwtRequestFilter;
 import com.rapid.security.JwtTokenDetails;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
 import com.rapid.service.exception.RapidGrooveException;
+import com.rapid.service.exception.TokenExpiredException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class CartServiceImpl implements CartService{
+public class CartServiceImpl extends BaseService implements CartService{
 
 
 
@@ -241,7 +242,8 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public CartDetails getItem() throws Exception {
+    public CartDetails getItem() throws TokenExpiredException,Exception {
+        checkTokenExpiration();
         String userName = JwtRequestFilter.CURRENT_USER;
         User user  = userRepository.findById(userName).orElseThrow( () -> new Exception("User Not Found"));
        CartDetails cartDetails = cartDetailsRepository.findByUser(user);

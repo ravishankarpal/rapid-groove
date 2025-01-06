@@ -11,7 +11,9 @@ import com.rapid.core.entity.order.CartItem;
 import com.rapid.service.CartService;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
 import com.rapid.service.exception.RapidGrooveException;
+import com.rapid.service.exception.TokenExpiredException;
 import jakarta.validation.Valid;
+import org.apache.el.parser.TokenMgrError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +72,7 @@ public class CartController {
     }
 
     @GetMapping(value = "/get")
-    public ResponseEntity<?> getItem() throws Exception {
+    public ResponseEntity<?> getItem() throws TokenExpiredException,Exception {
         CartDetails cartDetails = cartService.getItem();
         return new ResponseEntity<>(cartDetails,HttpStatus.OK);
 

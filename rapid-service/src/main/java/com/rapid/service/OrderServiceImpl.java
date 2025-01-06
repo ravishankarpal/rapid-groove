@@ -8,6 +8,7 @@ import com.rapid.core.dto.orders.OrderRequest;
 import com.rapid.core.dto.orders.OrderResponse;
 import com.rapid.core.dto.product.ProductItem;
 import com.rapid.core.entity.UserAddress;
+import com.rapid.core.entity.delivery.DeliverInfoDetails;
 import com.rapid.core.entity.order.OrderProductDetails;
 import com.rapid.core.enums.EndPoint;
 import com.rapid.core.entity.ConfigurationKeys;
@@ -17,6 +18,7 @@ import com.rapid.core.dto.OrderProductQuantityDto;
 import com.rapid.core.enums.OrderStatus;
 import com.rapid.dao.*;
 import com.rapid.security.JwtRequestFilter;
+import com.rapid.service.exception.TokenExpiredException;
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +37,7 @@ import java.util.*;
 @Slf4j
 
 
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl extends BaseService implements OrderService{
 
     @Autowired
     private OrderRepository orderRepository;
@@ -73,6 +75,9 @@ public class OrderServiceImpl implements OrderService{
 
     @Autowired
     private ImageModelRepository imageModelRepository;
+
+    @Autowired
+    private DeliverInfoDetailsRepository deliverInfoDetailsRepository;
 
     @Override
     public void placeOrder(OrderDto orderDto, boolean isSingleCartCheckOut) throws MessagingException, IOException {
@@ -284,26 +289,33 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public OrderResponse getOrderDetailsById(String id) {
+    public OrderResponse getOrderDetailsById(String id) throws TokenExpiredException {
+
+        checkTokenExpiration();
         log.info("Start fetching order details for id {}", id);
+
         OrderDetails orderDetails = orderRepository.findByOrderId(id);
         OrderResponse orderResponse = new OrderResponse(orderDetails);
         List<OrderProductDetails> orderProductDetails = orderDetails.getOrderProducts();
-        for (OrderProductDetails productDetails : orderProductDetails){
-            Integer productId =  Integer.valueOf(productDetails.getProductId());
-            productId = 3;
-
-            byte[] imageByte= imageModelRepository.findImageByProductId(productId);
+        for (OrderProductDetails productDetails : orderProductDetails) {
+            Integer productId = Integer.valueOf(productDetails.getProductId());
+            byte[] imageByte = imageModelRepository.findImageByProductId(productId);
             List<ProductItem> productItems = orderResponse.getItems();
-            for (ProductItem item : productItems){
+            for (ProductItem item : productItems) {
                 item.setImage(imageByte);
             }
         }
-        orderResponse.setTrackingInfo(null);
 
         orderResponse.getShippingAddress().setUser(null);
         log.info("Successfully fetched order details for id {}", id);
         return orderResponse;
+
+    }
+
+    @Override
+    public DeliverInfoDetails trackOrder(String orderId) {
+        log.info("going to fetch track details for order {}", orderId);
+        return deliverInfoDetailsRepository.findByOrderId(orderId);
 
     }
 

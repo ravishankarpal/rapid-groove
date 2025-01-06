@@ -18,13 +18,15 @@ public class TrackingInfo {
     private String carrier;
     private String trackingNumber;
     private String status;
-    private List<DeliveryTimeline> deliveryTimeline;
+    private String returnWindowClosedOn;
+    private List<DeliveryTimeline> timelines;
 
 
     public TrackingInfo(DeliverInfoDetails details) {
         this.carrier = details.getCarrier();
         this.trackingNumber = details.getTrackingNumber();
         this.status = details.getStatus();
-        this.deliveryTimeline = details.getTimelines();
+        this.timelines = details.getTimelines();
+        this.returnWindowClosedOn = details.getReturnWindowClosedOn();
     }
 }

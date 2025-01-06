@@ -8,6 +8,7 @@ import com.rapid.core.dto.checkout.CheckoutRequestResponse;
 import com.rapid.core.entity.cart.CartDetails;
 import com.rapid.core.entity.order.CartItem;
 import com.rapid.service.exception.RapidGrooveException;
+import com.rapid.service.exception.TokenExpiredException;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public interface CartService {
 
     void addItemToCartV2(CartRequestDTO cartRequestDTO) throws Exception;
 
-    CartDetails getItem() throws Exception;
+    CartDetails getItem() throws TokenExpiredException, Exception;
 
     void delete(Long cartItemId) throws Exception;
 

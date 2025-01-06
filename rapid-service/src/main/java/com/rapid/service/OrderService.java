@@ -5,7 +5,9 @@ import com.rapid.core.dto.orders.OrderExtend;
 import com.rapid.core.dto.orders.CashFreeOrderResponse;
 import com.rapid.core.dto.orders.OrderRequest;
 import com.rapid.core.dto.orders.OrderResponse;
+import com.rapid.core.entity.delivery.DeliverInfoDetails;
 import com.rapid.core.enums.OrderStatus;
+import com.rapid.service.exception.TokenExpiredException;
 import jakarta.mail.MessagingException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -32,5 +34,7 @@ public interface OrderService {
 
     Page<OrderResponse> getOrders(String period, OrderStatus status, int page, int size);
 
-    OrderResponse getOrderDetailsById(String id);
+    OrderResponse getOrderDetailsById(String id) throws TokenExpiredException;
+
+    DeliverInfoDetails trackOrder(String orderId);
 }

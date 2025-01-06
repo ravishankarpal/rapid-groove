@@ -6,7 +6,9 @@ import com.rapid.core.dto.orders.OrderExtend;
 import com.rapid.core.dto.orders.CashFreeOrderResponse;
 import com.rapid.core.dto.orders.OrderRequest;
 import com.rapid.core.dto.orders.OrderResponse;
+import com.rapid.core.entity.delivery.DeliverInfoDetails;
 import com.rapid.core.enums.OrderStatus;
+import com.rapid.service.exception.TokenExpiredException;
 import com.rapid.service.EmailService;
 import com.rapid.service.OrderService;
 import com.rapid.service.PdfService;
@@ -16,8 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
@@ -139,7 +139,7 @@ public class OrderController {
     }
 
     @GetMapping("/details/{id}")
-    public ResponseEntity<?> getOrderDetailsById(@PathVariable("id") String id){
+    public ResponseEntity<?> getOrderDetailsById(@PathVariable("id") String id) throws TokenExpiredException {
 
         OrderResponse response = orderService.getOrderDetailsById(id);
         return ResponseEntity.ok(response);
@@ -154,6 +154,12 @@ public class OrderController {
         pdfService.generatePDF(orderId,pdfPath);
         return new ResponseEntity<>(HttpStatus.OK);
 
+    }
+
+    @GetMapping("/track/order/{order_id}")
+    public ResponseEntity<?> trackOrder(@PathVariable("order_id") String orderId){
+        DeliverInfoDetails details = orderService.trackOrder(orderId);
+        return ResponseEntity.ok(details);
     }
 
 

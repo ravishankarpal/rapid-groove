@@ -33,7 +33,6 @@ public class OrderResponse {
     private UserAddress shippingAddress;
     private List<ProductItem> items = new ArrayList<>();
     private String deliveryDate;
-    private String returnWindowCloseDate;
     private TrackingInfo trackingInfo;
     public OrderResponse(OrderDetails orders) {
         this.orderId = orders.getOrderId();
@@ -49,7 +48,6 @@ public class OrderResponse {
 
         this.paymentMethod = orders.getOrderMeta().getPaymentMethods();
         this.deliveryDate = LocalDateTime.now().toString();
-        this.returnWindowCloseDate = LocalDateTime.now().toString();
         this.trackingInfo= new TrackingInfo(orders.getDeliveryInfo());
 
     }
