@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import com.rapid.core.dto.product.ProductDTO;
+import com.rapid.core.dto.product.ProductOfferDTO;
 import com.rapid.core.dto.product.ReviewDTO;
 import com.rapid.core.dto.product.SizeDTO;
 import jakarta.persistence.*;
@@ -90,6 +91,12 @@ public class ProductDetails implements Serializable {
    @JsonInclude
    @JsonProperty("relatedProducts")
    private List<RelatedProduct> relatedProducts;
+
+    @OneToMany(mappedBy = "productDetails", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductCoupon> productCoupon= new ArrayList<>() ;
+
+
+
 
 
     public ProductDetails(ProductDTO productDTO, Set<ImageModel> imageModels) {
