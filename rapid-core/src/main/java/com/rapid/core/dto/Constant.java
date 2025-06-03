@@ -18,6 +18,9 @@ public class Constant {
 
     public static final int OTP_VALIDITY_MINUTES = 2;
 
+    public static final String  CASHFREE_CLIENT_ID_AND_SECRET = "cashfree_client_id_and_secret";
+    public static  final String RETURN_WINDOW_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
 
 
 

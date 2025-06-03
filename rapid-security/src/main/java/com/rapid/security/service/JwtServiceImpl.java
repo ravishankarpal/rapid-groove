@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -60,10 +61,12 @@ public class JwtServiceImpl implements UserDetailsService,JwtService {
         String userPassword = jwtRequest.getUserPassword();
         authenticate(userName,userPassword);
         final  UserDetails userDetails = loadUserByUsername(userName);
-        String generatedToken  = jwtTokenDetails.generateJwtToken(userDetails);
+        Map<String, Object> tokenDetails  = jwtTokenDetails.generateJwtToken(userDetails);
+        String generatedToken = (String) tokenDetails.get("token");
+        String expireTime = (String) tokenDetails.get("expireTime");
         Optional<User> userOptional  = userRepository.findById(userName);
         log.info("Authentication Success");
-        return userOptional.map(user -> new JwtResponse(user, generatedToken)).
+        return userOptional.map(user -> new JwtResponse(user, generatedToken,expireTime)).
                 orElse(null);
 
     }

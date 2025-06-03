@@ -1,56 +1,54 @@
 package com.rapid.core.dto.orders;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.rapid.core.dto.cart.CartDetailResponse;
+import com.rapid.core.dto.delivery.ShipmentDetails;
+import com.rapid.core.dto.delivery.TrackingInfo;
+import com.rapid.core.dto.product.ProductItem;
+import com.rapid.core.entity.UserAddress;
+import com.rapid.core.entity.delivery.DeliverInfoDetails;
+import com.rapid.core.entity.order.OrderDetails;
+import com.rapid.core.entity.order.OrderProductDetails;
+import com.rapid.core.enums.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.domain.Page;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderResponse {
-
-    @JsonProperty(value = "cart_details")
-    private CartDetailResponse cartDetailResponse;
-
-    @JsonProperty(value = "cf_order_id")
-    private String cfOrderId;
-
-    @JsonProperty(value = "created_at")
-    private String createdAt;
-
-    @JsonProperty(value = "customer_details")
-    private CustomerDetails customerDetails;
-
-    @JsonProperty(value = "entity")
-    private String entity;
-
-    @JsonProperty(value = "order_amount")
-    private double order_amount;
-
-    @JsonProperty(value = "order_currency")
-    private String orderCurrency;
-    @JsonProperty(value = "order_expiry_time")
-    private String orderExpiryTime;
-
-    @JsonProperty(value = "order_id")
     private String orderId;
+    private String orderDate;
+    private OrderStatus orderStatus;
+    private String paymentMethod;
+    private double shippingCharge;
+    private double cashOnDelivery;
+    private double totalAmount;
+    private UserAddress shippingAddress;
+    private List<ProductItem> items = new ArrayList<>();
+    private String deliveryDate;
+    private TrackingInfo trackingInfo;
+    public OrderResponse(OrderDetails orders) {
+        this.orderId = orders.getOrderId();
+        this.orderDate = String.valueOf(orders.getCreatedAt());
+        this.orderStatus = orders.getOrderStatus();
+        this.totalAmount = orders.getOrderAmount();
+        this.shippingAddress = orders.getUserAddress();
+        this.shippingCharge =orders.getShippingCharge();
+        for (OrderProductDetails orderProductDetails:  orders.getOrderProducts()){
+            ProductItem item = new ProductItem(orderProductDetails);
+            this.items.add(item);
+        }
 
-    @JsonProperty(value = "order_meta")
-    private OrderMetaData orderMetaData;
+        this.paymentMethod = orders.getOrderMeta().getPaymentMethods();
+        this.deliveryDate = LocalDateTime.now().toString();
+        this.trackingInfo= new TrackingInfo(orders.getDeliveryInfo());
 
-    @JsonProperty(value = "order_note")
-    private String  orderNote;
-
-    @JsonProperty(value = "order_status")
-    private String  orderStatus;
-
-
-
-    @JsonProperty(value = "payment_session_id")
-    private String paymentSessionId;
-
+    }
 }

@@ -8,7 +8,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum EndPoint {
     PG_ORDERS("/pg/orders"),
-    SUBMIT_OTP("/pg/orders/pay/authenticate/");
+    AUTHENTICATE("/pg/orders/pay/authenticate/"),
+    PG_ORDERS_SESSION("/pg/orders/sessions") ;
 
     public String endPoint;
 

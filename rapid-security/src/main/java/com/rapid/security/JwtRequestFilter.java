@@ -7,12 +7,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -32,6 +28,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private JwtService jwtService;
 
     public static  String CURRENT_USER = "";
+    public static boolean IS_TOKEN_EXPIRED = false;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse
             response, FilterChain filterChain) throws ServletException,
@@ -48,7 +45,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             } catch (IllegalArgumentException e) {
                 log.error("Unable to fetch jwt token", e);
             } catch (ExpiredJwtException e) {
-                log.error("Jwt token expired", e);
+                IS_TOKEN_EXPIRED = true;
+
             }
         }else{
             log.info("Header must be start with Bearer");

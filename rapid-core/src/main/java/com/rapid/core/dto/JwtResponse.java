@@ -14,4 +14,6 @@ public class JwtResponse {
     private User user;
 
     private String jwtToken;
+
+    private String expireTime;
 }

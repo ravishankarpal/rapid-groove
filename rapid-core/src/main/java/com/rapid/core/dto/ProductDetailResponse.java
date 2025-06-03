@@ -2,8 +2,6 @@ package com.rapid.core.dto;
 
 
 import com.rapid.core.entity.product.ImageModel;
-import com.rapid.core.entity.product.ProductSizePrice;
-import com.rapid.core.entity.product.Products;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

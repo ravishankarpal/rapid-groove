@@ -3,11 +3,17 @@ package com.rapid.service;
 
 import com.rapid.core.dto.*;
 import com.rapid.core.dto.cart.CartRequestDTO;
+import com.rapid.core.dto.checkout.CartSummaryResponse;
+import com.rapid.core.dto.checkout.CheckoutDTO;
+import com.rapid.core.dto.checkout.CheckoutItemRequest;
+import com.rapid.core.dto.checkout.CheckoutRequestResponse;
 import com.rapid.core.entity.CheckoutItem;
 import com.rapid.core.entity.CheckoutRequest;
 import com.rapid.core.entity.User;
 import com.rapid.core.entity.cart.CartDetails;
 import com.rapid.core.entity.cart.CartItemDetails;
+import com.rapid.core.entity.checkout.CheckoutDetails;
+import com.rapid.core.entity.checkout.CheckoutItemEntity;
 import com.rapid.core.entity.order.Cart;
 import com.rapid.core.entity.order.CartItem;
 import com.rapid.core.entity.product.*;
@@ -16,10 +22,14 @@ import com.rapid.security.JwtRequestFilter;
 import com.rapid.security.JwtTokenDetails;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
 import com.rapid.service.exception.RapidGrooveException;
+import com.rapid.service.exception.TokenExpiredErrorResponse;
+import com.rapid.service.exception.TokenExpiredException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -31,10 +41,9 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class CartServiceImpl implements CartService{
+public class CartServiceImpl extends BaseService implements CartService{
 
-    @Autowired
-    private ProductRepository productRepository;
+
 
     @Autowired
     private UserRepository userRepository ;
@@ -63,100 +72,13 @@ public class CartServiceImpl implements CartService{
 
     @Autowired
     private ProductDetailsRepository productDetailsRepository;
-    @Override
-        public void addToCart(Integer productId) {
-            log.info("going to add product in cart for productId :{}",productId);
-            Optional<Products> products = productRepository.findById(productId);
-            String userName  = null;
-            if (products.isPresent()){
-                userName =  JwtRequestFilter.CURRENT_USER;
-                Optional<User> user = userRepository.findById(userName);
-                if (user.isPresent()){
-                    log.info("going to add product in cart for productId :{} by user :{}"
-                            ,productId,user.get().getEmail());
-                    List<Cart> cart = cartRepository.findCartByUserId(user.get().getEmail());
-                    if(CollectionUtils.isEmpty(cart)){
-                        cart.add(new Cart(user.get()));
-                    }
-                    List<CartItem> existingItem = cart.get(0).getCartItems().stream()
-                            .filter(item -> item.getProducts().equals(products.get()))
-                            .toList();
 
-                    if (!CollectionUtils.isEmpty(existingItem)) {
-                        existingItem.get(0).setQuantity(existingItem.get(0).getQuantity() + 1);
-                    } else {
-                        CartItem cartItem = new CartItem();
-                        cartItem.setProducts(products.get());
-                        cartItem.setQuantity(1);
-                        cartItem.setCart(cart.get(0));
-                        cart.get(0).getCartItems().add(cartItem);
-                    }
-                    cartRepository.saveAndFlush(cart.get(0));
-                    log.info("Product has been successfully added in user cart username :{} cartDetails :{}",
-                            userName,cart);
-                }
-            }
-            else{
-                log.info("Product Details not found!");
-                throw  new ProductDetailsNotFoundException("Product Details not found!");
-            }
-        }
+    @Autowired
+    private CheckoutDetailsRepository checkoutDetailsRepository;
 
+    @Autowired
+    private ImageModelRepository imageModelRepository;
 
-
-
-
-
-
-
-
-    @Override
-    public void addItemToCart(AddToCartRequestDTO requestDTO) throws RapidGrooveException {
-        Integer productId = requestDTO.getProductId();
-        log.info("going to add product in cart for productId :{}",productId);
-
-
-        Products product = productRepository.findById(productId)
-                .orElseThrow(() -> new RapidGrooveException("Product not found"));
-
-        ProductSizePrice sizePrice = productSizePriceRepository.findById(requestDTO.getSizePriceId())
-                .orElseThrow(() -> new RapidGrooveException("Product size not found"));
-
-        String userName =  JwtRequestFilter.CURRENT_USER;
-        User user = userRepository.findById(userName).orElseThrow(() -> new RapidGrooveException("User not found"));
-        Cart cart = cartRepository.findCartByUserName(userName);
-        if (cart == null){
-            cart = new Cart(user);
-        }
-
-//        CartItem existingCartItem = cart.getCartItems().stream().filter(item -> item.getProducts().getProductId().equals(product.getProductId())
-//        && item.getProductSizePrice().getSizePriceId().equals(sizePrice.getSizePriceId())).findFirst().orElse(null);
-
-        List<CartItem> items = Optional.ofNullable(cart.getCartItems()).orElse(new ArrayList<>());
-        CartItem existingCartItem = items.stream()
-                .filter(item -> item.getProducts().getProductId().equals(product.getProductId())
-                        && item.getProductSizePrice().getSizePriceId().equals(sizePrice.getSizePriceId()))
-                .findFirst()
-                .orElse(null);
-
-        if (existingCartItem != null) {
-            existingCartItem.setQuantity(existingCartItem.getQuantity() + requestDTO.getQuantity());
-        } else {
-            CartItem cartItem = new CartItem();
-            cartItem.setProducts(product);
-            cartItem.setQuantity(requestDTO.getQuantity());
-            cartItem.setPrice(sizePrice.getFinalPrice());
-            cartItem.setCart(cart);
-            if (cart.getCartItems() == null) {
-                cart.setCartItems(new ArrayList<>());
-            }
-            cartItem.setProductSizePrice(sizePrice);
-            cart.getCartItems().add(cartItem);
-        }
-        cartRepository.saveAndFlush(cart);
-        log.info("Item added in cart successfully for user {}", userName);
-
-    }
 
 
 
@@ -172,149 +94,6 @@ public class CartServiceImpl implements CartService{
         cartRepository.deleteById(cartId);
         cartItemRepository.deleteById(cartId);
     }
-
-
-//    @Override
-//    public List<CartItemResponseDTO> getCartCartDetailsFomUserToken() {
-//        List<CartItemResponseDTO> cartItemResponseDTOS = new ArrayList<>();
-//        CartItemResponseDTO cartItemResponseDTO = new CartItemResponseDTO();
-//        String userName = JwtRequestFilter.CURRENT_USER;
-//        try {
-//            log.info("Fetching cart details for user {}", userName);
-//            List<CartItem> cartItems = cartItemRepository.getCartDetails(userName);
-//            List<ProductSizePrice> productSizePrices = new ArrayList<>();
-//            List<CartProduct> cartProducts = new ArrayList<>();
-//
-//            if (!CollectionUtils.isEmpty(cartItems)) {
-//                for (CartItem cartItem : cartItems){
-//                    ProductSizePrice productSizePrice = new ProductSizePrice();
-//                    cartItemResponseDTO.setId(cartItem.getId());
-//                    CartProduct cartProduct = new CartProduct(cartItem.getProducts());
-//                    cartProducts.add(cartProduct);
-//                    cartItemResponseDTO.setProduct(cartProducts);
-//                    productSizePrice = cartItem.getProductSizePrice();
-//                    productSizePrices.add(productSizePrice);
-//                    cartItemResponseDTO.setProductSizePrice(productSizePrices);
-//                    cartItemResponseDTOS.add(cartItemResponseDTO);
-//
-//                }
-//
-//            }
-//
-//            log.info("Successfully fetched cart details for user {}", userName);
-//        }catch (Exception e){
-//            log.error("Error while fetching cart details for user {}", userName, e.getMessage());
-//        }
-//
-//        return  cartItemResponseDTOS;
-//
-//    }
-
-
-
-
-
-//    @Override
-//    public List<CartItemResponseDTO> getCartCartDetailsFomUserToken() {
-//        List<CartItemResponseDTO> cartItemResponseDTOS = new ArrayList<>();
-//        String userName = JwtRequestFilter.CURRENT_USER;
-//
-//        try {
-//            log.info("Fetching cart details for user {}", userName);
-//            List<CartItem> cartItems = cartItemRepository.getCartDetails(userName);
-//
-//            if (!CollectionUtils.isEmpty(cartItems)) {
-//                // Grouping cart items by ID so that multiple products under the same cart item are handled properly
-//                Map<Integer, CartItemResponseDTO> cartMap = new HashMap<>();
-//
-//                for (CartItem cartItem : cartItems) {
-//                    CartItemResponseDTO cartItemResponseDTO;
-//
-//                    // Check if the current cart item already exists
-//                    if (cartMap.containsKey(cartItem.getId())) {
-//                        cartItemResponseDTO = cartMap.get(cartItem.getId());
-//                    } else {
-//                        cartItemResponseDTO = new CartItemResponseDTO();
-//                        cartItemResponseDTO.setId(cartItem.getId());
-//                        cartItemResponseDTO.setProduct(new ArrayList<>());
-//                        cartItemResponseDTO.setProductSizePrice(new ArrayList<>());
-//                    }
-//
-//                    // Add product details
-//                    CartProduct cartProduct = new CartProduct(cartItem.getProducts());
-//                    cartItemResponseDTO.getProduct().add(cartProduct);
-//
-//                    // Add product size and price details
-//                    ProductSizePrice productSizePrice = cartItem.getProductSizePrice();
-//                    if (productSizePrice != null) {
-//                        cartItemResponseDTO.getProductSizePrice().add(productSizePrice);
-//                    }
-//
-//                    // Update the cartMap
-//                    cartMap.put(cartItem.getId(), cartItemResponseDTO);
-//                }
-//
-//                // Add all items from the map to the final list
-//                cartItemResponseDTOS.addAll(cartMap.values());
-//            }
-//
-//            log.info("Successfully fetched cart details for user {}", userName);
-//        } catch (Exception e) {
-//            log.error("Error while fetching cart details for user {}", userName, e);
-//        }
-//
-//        return cartItemResponseDTOS;
-//    }
-
-
-
-    @Override
-    public List<CartItemResponseDTO> getCartCartDetailsFomUserToken() {
-        List<CartItemResponseDTO> cartItemResponseDTOS = new ArrayList<>();
-        String userName = JwtRequestFilter.CURRENT_USER;
-
-        try {
-            log.info("Fetching cart details for user {}", userName);
-            List<CartItem> cartItems = cartItemRepository.getCartDetails(userName);
-
-            if (!CollectionUtils.isEmpty(cartItems)) {
-                // Grouping cart items by ID so that multiple products under the same cart item are handled properly
-                Map<Integer, CartItemResponseDTO> cartMap = new HashMap<>();
-
-                for (CartItem cartItem : cartItems) {
-                    CartItemResponseDTO cartItemResponseDTO;
-
-                    // Check if the current cart item already exists
-                    if (cartMap.containsKey(cartItem.getId())) {
-                        cartItemResponseDTO = cartMap.get(cartItem.getId());
-                    } else {
-                        cartItemResponseDTO = new CartItemResponseDTO();
-                        cartItemResponseDTO.setId(cartItem.getId());
-                        cartItemResponseDTO.setProduct(new ArrayList<>());
-                        cartItemResponseDTO.setProductSizePrice(new ArrayList<>());
-                    }
-
-                    CartProduct cartProduct = new CartProduct(cartItem.getProducts());
-                    cartItemResponseDTO.getProduct().add(cartProduct);
-                    ProductSizePrice productSizePrice = cartItem.getProductSizePrice();
-                    if (productSizePrice != null) {
-                        productSizePrice.setQty(cartItem.getQuantity());
-                        cartItemResponseDTO.getProductSizePrice().add(productSizePrice);
-                    }
-
-                    cartMap.put(cartItem.getId(), cartItemResponseDTO);
-                }
-                cartItemResponseDTOS.addAll(cartMap.values());
-            }
-
-            log.info("Successfully fetched cart details for user {}", userName);
-        } catch (Exception e) {
-            log.error("Error while fetching cart details for user {}", userName, e);
-        }
-
-        return cartItemResponseDTOS;
-    }
-
 
     @Override
     public void updateCartQuantity(UpdateCartDTO updateCartDTO) throws Exception {
@@ -435,28 +214,6 @@ public class CartServiceImpl implements CartService{
             throw new IllegalStateException("No pricing information available for the selected size");
         }
 
-//
-//
-//        Optional<CartItemDetails> existingCartItem = cartDetails.getCartItemDetails().stream()
-//                .filter(item ->
-//                        item.getProduct().getId().equals(product.getId()) &&
-//                                item.getSelectedSize().getValue().equals(selectedSize.getValue()))
-//                .findFirst();
-//
-//
-//        if (existingCartItem.isPresent()) {
-//            // Update quantity if item exists
-//            CartItemDetails item = existingCartItem.get();
-//            item.setQuantity(item.getQuantity() + cartRequestDTO.getQuantity());
-//        } else {
-//            // Create new cart item
-//            CartItemDetails newCartItem = new CartItemDetails();
-//            newCartItem.setProduct(product);
-//            newCartItem.setSelectedSize(selectedSize);
-//            newCartItem.setQuantity(cartRequestDTO.getQuantity());
-//            cartDetails.getCartItemDetails().add(newCartItem);
-//        }
-
         int totalExistingQuantity = cartDetails.getCartItemDetails().stream()
                 .filter(item ->
                         item.getProduct().getId().equals(product.getId()) &&
@@ -487,9 +244,12 @@ public class CartServiceImpl implements CartService{
     }
 
     @Override
-    public CartDetails getItem() throws Exception {
+    public CartDetails getItem() throws TokenExpiredException,Exception {
         String userName = JwtRequestFilter.CURRENT_USER;
+        checkTokenExpiration();
+
         User user  = userRepository.findById(userName).orElseThrow( () -> new Exception("User Not Found"));
+
        CartDetails cartDetails = cartDetailsRepository.findByUser(user);
         if (cartDetails == null) {
             cartDetails = new CartDetails(user);
@@ -530,6 +290,192 @@ public class CartServiceImpl implements CartService{
 
 
     }
+
+    @Override
+    public CheckoutRequestResponse saveCheckoutDetails(com.rapid.core.dto.checkout.CheckoutRequest checkoutRequest) {
+        String username = JwtRequestFilter.CURRENT_USER;
+        User user = userRepository.findById(username).orElseThrow(() -> new UsernameNotFoundException("User Not found!"));
+        log.info("Start saving checkout details for product id {} for user {}",username );
+        List<CheckoutDetails> details = checkoutDetailsRepository.findByUser(username);
+        if(!CollectionUtils.isEmpty(details)){
+            checkoutDetailsRepository.deleteByUser(username);
+        }
+        CheckoutDetails checkoutDetails = new CheckoutDetails(checkoutRequest, user);
+        checkoutDetailsRepository.saveAndFlush(checkoutDetails);
+        CheckoutRequestResponse checkoutRequestResponse = new CheckoutRequestResponse();
+        List<Integer> productId = new ArrayList<>();
+        productId.addAll(
+                checkoutDetails.getItemRequests()
+                        .stream()
+                        .filter(id -> id.getProductId() != null)
+                        .map(id -> id.getProductId())
+                        .collect(Collectors.toList())
+        );
+         List<String> productSize = new ArrayList<>();
+        productSize.addAll(checkoutDetails.getItemRequests()
+                 .stream()
+                 .filter(size -> size.getSize() != null)
+                 .map(size -> size.getSize())
+                 .collect(Collectors.toList()));
+
+        checkoutRequestResponse.setProductId(productId);
+        checkoutRequestResponse.setProductSize(productSize);
+
+        log.info("Successfully saved checkout details for product id {} for user {}",username );
+        return checkoutRequestResponse;
+    }
+
+//    @Override
+//    public com.rapid.core.dto.checkout.CheckoutResponse getCheckoutDetails(CheckoutDTO checkoutDTO) throws Exception {
+//        String username = JwtRequestFilter.CURRENT_USER;
+//        User user = userRepository.findById(username).orElseThrow(() -> new UsernameNotFoundException("User Not found!"));
+//        log.info("Start fetching checkout details for product id {} for user {}",username );
+//        CheckoutDetails checkoutDetails = checkoutDetailsRepository.findByProductIdAndSizeAndUser(checkoutDTO.getProductId(),checkoutDTO.getProductSize(),user.getEmail());
+//        List<com.rapid.core.dto.checkout.CheckoutItemResponse> itemResponses = new ArrayList<>();
+//        for (CheckoutItemEntity checkoutItemEntity : checkoutDetails.getItemRequests()){
+//            byte image[] = imageModelRepository.findImageByProductId(checkoutItemEntity.getProductId());
+//            ProductDetails productDetails = productDetailsRepository.findById(checkoutItemEntity.getProductId()).orElseThrow(() -> new Exception("product Not found!"));
+//            com.rapid.core.dto.checkout.CheckoutItemResponse checkoutItemResponse = new com.rapid.core.dto.checkout.CheckoutItemResponse(checkoutItemEntity, image, productDetails);
+//            itemResponses.add(checkoutItemResponse);
+//        }
+//
+//
+//
+//        CartSummaryResponse cartSummaryResponse = new CartSummaryResponse(checkoutDetails);
+//        com.rapid.core.dto.checkout.CheckoutResponse checkoutResponse = new com.rapid.core.dto.checkout.CheckoutResponse();
+//        checkoutResponse.setItemResponses(itemResponses);
+//        checkoutResponse.setCartSummaryResponse(cartSummaryResponse);
+//        log.info("Successfully fetched checkout details for product id {} for user {}",username );
+//        return checkoutResponse;
+//
+//    }
+
+    @Override
+    public com.rapid.core.dto.checkout.CheckoutResponse getCheckoutDetails(CheckoutDTO checkoutDTO) throws Exception {
+        String username = JwtRequestFilter.CURRENT_USER;
+        User user = userRepository.findById(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User Not found!"));
+        log.info("Start fetching checkout details for user {}", username);
+
+        // Validate input
+        if (checkoutDTO.getProductId().size() != checkoutDTO.getProductSize().size()) {
+            throw new IllegalArgumentException("Mismatch between product IDs and sizes.");
+        }
+
+        List<com.rapid.core.dto.checkout.CheckoutItemResponse> itemResponses = new ArrayList<>();
+        CheckoutDetails checkoutDetails  = null;
+
+        for (int i = 0; i < checkoutDTO.getProductId().size(); i++) {
+            Integer productId = checkoutDTO.getProductId().get(i);
+            String size = checkoutDTO.getProductSize().get(i);
+
+            // Fetch checkout details for each product and size
+             checkoutDetails = checkoutDetailsRepository.findByProductIdAndSizeAndUser(
+                    productId, size, user.getEmail());
+
+            if (checkoutDetails == null) {
+                log.warn("No checkout details found for product ID {} and size {}", productId, size);
+                continue; // Skip if no details found
+            }
+
+//            for (CheckoutItemEntity checkoutItemEntity : checkoutDetails.getItemRequests()) {
+//                ProductDetails productDetails = productDetailsRepository.findById(checkoutItemEntity.getProductId())
+//                        .orElseThrow(() -> new Exception("Product not found for ID: " + checkoutItemEntity.getProductId()));
+//                com.rapid.core.dto.checkout.CheckoutItemResponse checkoutItemResponse = new com.rapid.core.dto.checkout.CheckoutItemResponse(
+//                        checkoutItemEntity, productDetails);
+//                itemResponses.add(checkoutItemResponse);
+//            }
+        }
+
+        for (CheckoutItemEntity checkoutItemEntity : checkoutDetails.getItemRequests()) {
+            ProductDetails productDetails = productDetailsRepository.findById(checkoutItemEntity.getProductId())
+                    .orElseThrow(() -> new Exception("Product not found for ID: " + checkoutItemEntity.getProductId()));
+            com.rapid.core.dto.checkout.CheckoutItemResponse checkoutItemResponse = new com.rapid.core.dto.checkout.CheckoutItemResponse(
+                    checkoutItemEntity, productDetails);
+            itemResponses.add(checkoutItemResponse);
+        }
+
+        // Create a summary response (assumes only one cart summary; adjust logic if needed)
+        CartSummaryResponse cartSummaryResponse = new CartSummaryResponse();
+        if (!itemResponses.isEmpty()) {
+            CheckoutDetails details = checkoutDetailsRepository.findByProductIdAndSizeAndUser(
+                    checkoutDTO.getProductId().get(0), checkoutDTO.getProductSize().get(0), user.getEmail());
+            cartSummaryResponse = new CartSummaryResponse(details);
+        }
+
+        // Build the response
+        com.rapid.core.dto.checkout.CheckoutResponse checkoutResponse = new com.rapid.core.dto.checkout.CheckoutResponse();
+        checkoutResponse.setItemResponses(itemResponses);
+        checkoutResponse.setCartSummaryResponse(cartSummaryResponse);
+
+        log.info("Successfully fetched checkout details for user {}", username);
+        return checkoutResponse;
+    }
+
+
+//
+//    @Override
+//    public com.rapid.core.dto.checkout.CheckoutResponse getCheckoutDetails(CheckoutDTO checkoutDTO) throws Exception {
+//        String username = JwtRequestFilter.CURRENT_USER;
+//        User user = userRepository.findById(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("User Not found!"));
+//        log.info("Start fetching checkout details for user {}", username);
+//
+//        // Validate input
+//        if (checkoutDTO.getProductId().size() != checkoutDTO.getProductSize().size()) {
+//            throw new IllegalArgumentException("Mismatch between product IDs and sizes.");
+//        }
+//
+//        List<com.rapid.core.dto.checkout.CheckoutItemResponse> itemResponses = new ArrayList<>();
+//        Set<String> processedProducts = new HashSet<>(); // To track processed productId + size combinations
+//
+//        for (int i = 0; i < checkoutDTO.getProductId().size(); i++) {
+//            Integer productId = checkoutDTO.getProductId().get(i);
+//            String size = checkoutDTO.getProductSize().get(i);
+//
+//            String productKey = productId + "_" + size; // A unique key for each product and size
+//
+//            if (processedProducts.contains(productKey)) {
+//                continue; // Skip if this product and size have already been processed
+//            }
+//
+//            // Mark this product and size as processed
+//            processedProducts.add(productKey);
+//
+//            // Fetch checkout details for each product and size
+//            CheckoutDetails checkoutDetails = checkoutDetailsRepository.findByProductIdAndSizeAndUser(
+//                    productId, size, user.getEmail());
+//
+//            if (checkoutDetails == null) {
+//                log.warn("No checkout details found for product ID {} and size {}", productId, size);
+//                continue; // Skip if no details found
+//            }
+//
+//            for (CheckoutItemEntity checkoutItemEntity : checkoutDetails.getItemRequests()) {
+//                ProductDetails productDetails = productDetailsRepository.findById(checkoutItemEntity.getProductId())
+//                        .orElseThrow(() -> new Exception("Product not found for ID: " + checkoutItemEntity.getProductId()));
+//                com.rapid.core.dto.checkout.CheckoutItemResponse checkoutItemResponse = new com.rapid.core.dto.checkout.CheckoutItemResponse(
+//                        checkoutItemEntity, productDetails);
+//                itemResponses.add(checkoutItemResponse);
+//            }
+//        }
+//
+//        // Create a summary response (assumes only one cart summary; adjust logic if needed)
+//        CartSummaryResponse cartSummaryResponse = new CartSummaryResponse();
+//        if (!itemResponses.isEmpty()) {
+//            CheckoutDetails checkoutDetails = checkoutDetailsRepository.findByProductIdAndSizeAndUser(
+//                    checkoutDTO.getProductId().get(0), checkoutDTO.getProductSize().get(0), user.getEmail());
+//            cartSummaryResponse = new CartSummaryResponse(checkoutDetails);
+//        }
+//
+//        // Build the response
+//        com.rapid.core.dto.checkout.CheckoutResponse checkoutResponse = new com.rapid.core.dto.checkout.CheckoutResponse();
+//        checkoutResponse.setItemResponses(itemResponses);
+//        checkoutResponse.setCartSummaryResponse(cartSummaryResponse);
+//
+//        log.info("Successfully fetched checkout details for user {}", username);
+//        return checkoutResponse;
+//    }
 
 
 }

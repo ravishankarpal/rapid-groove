@@ -29,7 +29,6 @@
             <artifactId>rapid-dao</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-
 <!--        <dependency>-->
 <!--            <groupId>com.rapid.dao</groupId>-->
 <!--            <artifactId>rapid-service</artifactId>-->
