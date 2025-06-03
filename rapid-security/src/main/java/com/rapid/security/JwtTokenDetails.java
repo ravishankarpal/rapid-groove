@@ -1,5 +1,6 @@
 package com.rapid.security;
 
+import com.rapid.core.dto.Constant;
 import com.rapid.dao.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,14 +58,22 @@ public class JwtTokenDetails {
         return getClaimFromToken(token, Claims::getExpiration);
     }
 
-    public String generateJwtToken(UserDetails userDetails){
+    public Map<String, Object> generateJwtToken(UserDetails userDetails){
         Map<String, Object> claims = new HashMap<>();
-        return Jwts.builder().setClaims(claims)
+        Date expirationTime = new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000);
+
+       String token =  Jwts.builder().setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+ TOKEN_VALIDITY * 1000))
+                .setExpiration(expirationTime)
                 .signWith(SignatureAlgorithm.HS512,SECRET_KEY)
                 .compact();
+        String expireTime = new SimpleDateFormat(Constant.RETURN_WINDOW_DATE_FORMAT).format(expirationTime);
+
+        Map<String, Object> tokenDetails = new HashMap<>();
+        tokenDetails.put("token", token);
+        tokenDetails.put("expireTime", expireTime);
+        return tokenDetails;
 
     }
 

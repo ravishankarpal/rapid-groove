@@ -22,9 +22,11 @@ import com.rapid.security.JwtRequestFilter;
 import com.rapid.security.JwtTokenDetails;
 import com.rapid.service.exception.ProductDetailsNotFoundException;
 import com.rapid.service.exception.RapidGrooveException;
+import com.rapid.service.exception.TokenExpiredErrorResponse;
 import com.rapid.service.exception.TokenExpiredException;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -243,9 +245,11 @@ public class CartServiceImpl extends BaseService implements CartService{
 
     @Override
     public CartDetails getItem() throws TokenExpiredException,Exception {
-        checkTokenExpiration();
         String userName = JwtRequestFilter.CURRENT_USER;
+        checkTokenExpiration();
+
         User user  = userRepository.findById(userName).orElseThrow( () -> new Exception("User Not Found"));
+
        CartDetails cartDetails = cartDetailsRepository.findByUser(user);
         if (cartDetails == null) {
             cartDetails = new CartDetails(user);
