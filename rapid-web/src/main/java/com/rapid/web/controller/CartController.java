@@ -66,8 +66,8 @@ public class CartController {
 
     @PostMapping  (value = "/v2/addItemToCart")
     public ResponseEntity<?> addItemToCartV2(@RequestBody CartRequestDTO cartRequestDTO) throws Exception {
-        cartService.addItemToCartV2(cartRequestDTO);
-        return new ResponseEntity<>(HttpStatus.OK);
+        Integer qty = cartService.addItemToCartV2(cartRequestDTO);
+        return new ResponseEntity<>(qty,HttpStatus.OK);
 
     }
 
