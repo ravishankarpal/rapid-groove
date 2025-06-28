@@ -27,7 +27,7 @@ public interface CartService {
     CheckoutResponse getCheckoutDetails() throws RapidGrooveException;
 
 
-    void addItemToCartV2(CartRequestDTO cartRequestDTO) throws Exception;
+    Integer addItemToCartV2(CartRequestDTO cartRequestDTO) throws Exception;
 
     CartDetails getItem() throws TokenExpiredException, Exception;
 

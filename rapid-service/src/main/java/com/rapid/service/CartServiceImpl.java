@@ -182,7 +182,7 @@ public class CartServiceImpl extends BaseService implements CartService{
     }
 
     @Override
-    public void addItemToCartV2(CartRequestDTO cartRequestDTO) throws Exception {
+    public Integer addItemToCartV2(CartRequestDTO cartRequestDTO) throws Exception {
         String userName = JwtRequestFilter.CURRENT_USER;
         User user  = userRepository.findById(userName).orElseThrow( () -> new Exception("User Not Found"));
         Integer productId = cartRequestDTO.getProductId();
@@ -239,7 +239,12 @@ public class CartServiceImpl extends BaseService implements CartService{
             cartDetails.setUser(user);
         }
         cartDetailsRepository.saveAndFlush(cartDetails);
+
         log.info("Item added in cart successfully for user {}", userName);
+
+        return cartDetails.getCartItemDetails().stream()
+                .mapToInt(CartItemDetails::getQuantity)
+                .sum();
 
     }
 
